@@ -23,8 +23,6 @@ public partial class BookStoreContext : DbContext
 
     public virtual DbSet<Customer> Customers { get; set; }
 
-    public virtual DbSet<CustomerOrderdetail> CustomerOrderdetails { get; set; }
-
     public virtual DbSet<Genre> Genres { get; set; }
 
     public virtual DbSet<Inventory> Inventories { get; set; }
@@ -159,31 +157,7 @@ public partial class BookStoreContext : DbContext
                 .HasColumnName("postal_code");
         });
 
-        modelBuilder.Entity<CustomerOrderdetail>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("Customer_Orderdetail");
-
-            entity.Property(e => e.CustomerName)
-                .HasMaxLength(101)
-                .HasColumnName("customer_name");
-            entity.Property(e => e.InventoryLeftPerBook).HasColumnName("inventory_left_per_book");
-            entity.Property(e => e.Isbn13)
-                .HasMaxLength(13)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("isbn13");
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.OrderedQuantities).HasColumnName("ordered_quantities");
-            entity.Property(e => e.StoreName)
-                .HasMaxLength(50)
-                .HasColumnName("store_name");
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .HasColumnName("title");
-        });
-
+      
         modelBuilder.Entity<Genre>(entity =>
         {
             entity.HasKey(e => e.GenreId).HasName("PK__Genres__18428D427A7E6811");

@@ -5,6 +5,8 @@ namespace BookStore_Domain;
 
 public partial class Customer
 {
+    public string FullName => $"{Firstname} {Lastname}";
+
     public int CustomerId { get; set; }
 
     public string Firstname { get; set; } = null!;

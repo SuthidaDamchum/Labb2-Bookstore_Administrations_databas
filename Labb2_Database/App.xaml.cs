@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace Labb2_Database
+namespace BookStore_Presentation
 {
     /// <summary>
     /// Interaction logic for App.xaml

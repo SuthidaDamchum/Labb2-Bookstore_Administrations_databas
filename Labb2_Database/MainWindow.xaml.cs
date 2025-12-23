@@ -8,17 +8,30 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using BookStore_Domain;
+using BookStore_Infrastrcuture.Data.Model;
+using BookStore_Presentation.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
-namespace Labb2_Database
+namespace BookStore_Presentation
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+       
         public MainWindow()
         {
             InitializeComponent();
+          
+
         }
+
+            
+
+        //DataContext = new MainWindowViewModel();
+
+
     }
-}
+    }
