@@ -13,6 +13,10 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        
+        
+        
+        
         <!-- DataGrid med böcker -->
         <DataGrid ItemsSource="{Binding Books}" AutoGenerateColumns="False" IsReadOnly="False" CanUserAddRows="False">
             <DataGrid.Columns>

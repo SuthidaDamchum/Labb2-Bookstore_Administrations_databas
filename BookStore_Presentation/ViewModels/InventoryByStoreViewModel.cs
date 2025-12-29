@@ -14,6 +14,8 @@ namespace BookStore_Presentation.ViewModels
 
         private BooksAdminViewModel _bookCatalog;
 
+        public ObservableCollection<BookAdminItem> Books => _bookCatalog.Books;
+
         public DelegateCommand IncreaseQuantityCommand { get; }
         public DelegateCommand DecreaseQuantityCommand { get; }
         public ICommand RemoveBookFromStoreCommand { get; }
@@ -77,8 +79,7 @@ namespace BookStore_Presentation.ViewModels
                {
                    if (SelectedInventoryItem != null)
                    {
-                       SelectedInventoryItem.Quantity++;
-                       UpdateQuantityInDatabase(SelectedInventoryItem, +1);
+                       UpdateQuantityInDatabase(SelectedInventoryItem, 1);
                    }
                },
                _ => SelectedInventoryItem != null
@@ -89,7 +90,6 @@ namespace BookStore_Presentation.ViewModels
                 {
                     if (SelectedInventoryItem != null && SelectedInventoryItem.Quantity > 0)
                     {
-                        SelectedInventoryItem.Quantity--;
                         UpdateQuantityInDatabase(SelectedInventoryItem, -1);
                     }
                 },
@@ -154,7 +154,8 @@ namespace BookStore_Presentation.ViewModels
             if (SelectedStore == null || item == null) return;
 
             var inventory = _context.Inventories
-             .FirstOrDefault(i => i.Isbn13 == item.ISBN && i.StoreId == SelectedStore.StoreId);
+             .FirstOrDefault(i => i.Isbn13 == item.ISBN 
+                                                      && i.StoreId == SelectedStore.StoreId);
 
             if (inventory != null)
             {

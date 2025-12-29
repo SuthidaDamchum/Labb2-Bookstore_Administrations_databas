@@ -26,6 +26,10 @@
                       Command="{Binding OpenBookAdminCommand}"/>
         </StackPanel>
 
+        
+        
+        
+        
         <!-- Main content area -->
         <ContentControl Content="{Binding CurrentViewModel}" />
     </DockPanel>

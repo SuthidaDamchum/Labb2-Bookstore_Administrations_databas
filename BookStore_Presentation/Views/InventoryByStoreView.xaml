@@ -21,21 +21,46 @@
         <ListBox ItemsSource="{Binding Stores}"
                  SelectedItem="{Binding SelectedStore}"
                  DisplayMemberPath="StoreName"/>
-        
+
+        <!-- RIGHT SIDE -->
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <!-- Buttons -->
+                <!-- Add/Remove -->
+                <RowDefinition Height="Auto"/>
+                <!-- Increase/Decrease -->
                 <RowDefinition Height="*"/>
                 <!-- DataGrid -->
             </Grid.RowDefinitions>
 
-            <!-- Buttons Row -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="0" Margin="10,0,0,300">
-                <Button Content="Increase Quantity" Width="103" Height="25" Margin="0,0,10,0" Command="{Binding IncreaseQuantityCommand}"/>
-                <Button Content="Decrease Quantity" Width="105" Height="25" Command="{Binding DecreaseQuantityCommand}" />
+
+            <!-- ComboBox + Add/Remove buttons -->
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10,10,0,10" VerticalAlignment="Top">
+                <ComboBox ItemsSource="{Binding Books}" 
+              SelectedItem="{Binding SelectedBook}" 
+              DisplayMemberPath="Title"
+              Width="250" Margin="0,0,10,0"/>
+
+                <Button Content="Add Book to Store"
+            Width="120"
+            Margin="10,0,10,0"
+            Command="{Binding AddBookToStoreCommand}" />
+
+                <Button Content="Remove Book from Store"
+            Width="120"
+            Command="{Binding RemoveBookFromStoreCommand}" />
             </StackPanel>
 
+            <!-- Increase/Decrease Quantity Buttons -->
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="10,20,0,10" VerticalAlignment="Top">
+                <Button Content="Increase Quantity" 
+            Width="120"
+            Margin="0,0,10,0"
+            Command="{Binding IncreaseQuantityCommand}" />
+                <Button Content="Decrease Quantity" 
+            Width="120"
+            Command="{Binding DecreaseQuantityCommand}" />
+            </StackPanel>
 
             <!-- DataGrid med lagersaldo -->
             <DataGrid ItemsSource="{Binding Inventory}" SelectedItem="{Binding SelectedInventoryItem, Mode=TwoWay}" IsReadOnly="True" Grid.Column="1" AutoGenerateColumns="False" Margin="10,50,0,0">
@@ -54,11 +79,8 @@
 </UserControl>
 
 
-
-<!--AddBookCommand
-RemoveBookCommand
-IncreaseQuantityCommand
-DecreaseQuantityCommand
-Function	Name (code/XAML)	Text / Content
-Add book	AddBookButton	Add Book
-Remove book	RemoveBookButton	Remove Book-->
+<!-- Buttons Row --><!--
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="0" Margin="10,0,0,300">
+    <Button Content="Increase Quantity" Width="103" Height="25" Margin="0,0,10,0" Command="{Binding IncreaseQuantityCommand}"/>
+    <Button Content="Decrease Quantity" Width="105" Height="25" Command="{Binding DecreaseQuantityCommand}" />
+</StackPanel>-->
