@@ -2,6 +2,12 @@
 using BookStore_Infrastrcuture.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using BookStore_Domain;
+using System.Drawing.Printing;
+using System.Windows.Input;
+using BookStore_Presentation.Dialogs;
+using BookStore_Presentation.Command;
+
+
 
 
 namespace BookStore_Presentation.ViewModels
@@ -12,11 +18,26 @@ namespace BookStore_Presentation.ViewModels
 
         public ObservableCollection<BookAdminItem> Books { get; }
 
+        public ICommand CreateNewTitleCommand { get; }
+
+
         public BooksAdminViewModel()
         {
             _context = new BookStoreContext();
             Books = new ObservableCollection<BookAdminItem>(LoadBooks());
+
+            CreateNewTitleCommand = new DelegateCommand(_ => OpenAddBookDialog());
+
+
         }
+
+        private void OpenAddBookDialog()
+        {
+            var dialog = new AddNewTitle();
+            dialog.ShowDialog();
+        }
+
+
 
         private List<BookAdminItem> LoadBooks()
         {
@@ -38,8 +59,11 @@ namespace BookStore_Presentation.ViewModels
                 .ToList();
         }
 
-
-        private void CreateNewTitle(string isbn13, string title, int? genreId,
+        public List<string> LanguageOptions { get; } = new List<string>
+                 {
+                   "English", "Swedish", "Norwegian", "French", "Spanish", "Danish", "German"
+                 };
+        public void CreateNewTitle(string isbn13, string title, int? genreId,
             string language, decimal price, List<int> existingAuthorIds)
 
         {
@@ -48,7 +72,7 @@ namespace BookStore_Presentation.ViewModels
             .ToList();
 
             if (!authors.Any())
-                throw new Exception("Could not find a book with the specified ID");
+                throw new Exception("Could not find any authors with the specified IDs.");
 
             var newBookTitle = new Book
             {
@@ -66,6 +90,26 @@ namespace BookStore_Presentation.ViewModels
             _context.Books.Add(newBookTitle);
             _context.SaveChanges();
 
+
+
+            string genreName = "";
+
+            if (genreId != null)
+            {
+                var genre = _context.Genres.Find(genreId);
+                if (genre != null)
+                {
+                    genreName = genre.GenreName;
+                }
+            }
+
+            //var genreName = genreId != null
+            //    ? _context.Genres.Find(genreId)?.GenreName ?? ""
+            //    : "";
+
+
+            
+
             Books.Add(new BookAdminItem
 
             {
@@ -73,28 +117,12 @@ namespace BookStore_Presentation.ViewModels
                 Isbn13 = newBookTitle.Isbn13,
                 Title = newBookTitle.Title,
                 AuthorNames = string.Join(", ", authors.Select(a => $"{a.FirstName} {a.LastName}")),
-                 Genre = newBookTitle.Genre != null ? newBookTitle.Genre.GenreName : "",
+                Genre = newBookTitle.Genre != null ? newBookTitle.Genre.GenreName : "",
                 Language = newBookTitle.Language,
-                 Price = newBookTitle.Price ?? 0m
+                Price = newBookTitle.Price ?? 0m
             });
 
         }
     }
 }
 
-
-//private void CreateNewPack()
-//{
-//    if (ConfigurationViewModel == null)
-//    {
-//        CurrentView = new ConfigurationViewModel(this);
-//    }
-//    var newQuestionPackViewModel = new QuestionPackViewModel(new QuestionPack("<PackName>"));
-//    var dialog = new AddNewQuestionDialog(newQuestionPackViewModel);
-
-//    if (dialog.ShowDialog() == true)
-//    {
-//        ActivePack = newQuestionPackViewModel;
-//        Packs.Add(newQuestionPackViewModel);
-//        CurrentView = ConfigurationViewModel;
-//    }

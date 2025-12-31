@@ -13,8 +13,6 @@ namespace BookStore_Presentation.ViewModels
         public ICommand OpenInventoryByStoreCommand { get; }
         public ICommand OpenBookAdminCommand { get; }
 
-
-
         private ViewModelBase? _currentViewModel;
         public ViewModelBase? CurrentViewModel
         {
@@ -32,7 +30,6 @@ namespace BookStore_Presentation.ViewModels
 
         {
            
-
             _context = new BookStoreContext();
 
             OpenInventoryByStoreCommand = new DelegateCommand(_ =>

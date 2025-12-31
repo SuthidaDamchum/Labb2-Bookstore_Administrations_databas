@@ -37,7 +37,6 @@ namespace BookStore_Presentation.ViewModels
         }
 
 
-
         private Store? _selectedStore;
         public Store? SelectedStore
         {
@@ -65,8 +64,6 @@ namespace BookStore_Presentation.ViewModels
             }
         }
 
-
-  
 
         public InventoryByStoreViewModel()
         {
@@ -119,7 +116,6 @@ namespace BookStore_Presentation.ViewModels
         }
 
 
-
         public ICommand AddBookToStoreCommand { get; }
 
         private void AddBookToStore(BookAdminItem book)
@@ -146,8 +142,6 @@ namespace BookStore_Presentation.ViewModels
             LoadInventory();
              
         }
-
-
 
         private void RemoveBookFromStore(InventoryItem item)
         {

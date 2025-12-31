@@ -23,7 +23,7 @@ public partial class Book
 
     public virtual ICollection<BookAuthor> BookAuthors { get; set; } = new List<BookAuthor>();
 
-    public virtual Genre? Genre { get; set; }
+    public virtual Genre? Genre { get; set; }   
 
     public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
 

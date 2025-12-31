@@ -17,7 +17,7 @@ public class BookAuthorEntityTypeConfiguration : IEntityTypeConfiguration<BookAu
                 .HasMaxLength(13)
                 .IsUnicode(false)
                 .IsFixedLength()
-                .HasColumnName("BookISBN13");
+                .HasColumnName("BookIsbn13");
             builder.Property(e => e.AuthorId).HasColumnName("author_id");
             builder.Property(e => e.Role)
                 .HasMaxLength(20)
@@ -30,7 +30,7 @@ public class BookAuthorEntityTypeConfiguration : IEntityTypeConfiguration<BookAu
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BookAuthor_Authors");
 
-            builder.HasOne(d => d.BookIsbn13Navigation).WithMany(p => p.BookAuthors)
+            builder.HasOne(d => d.Book).WithMany(p => p.BookAuthors)
                 .HasForeignKey(d => d.BookIsbn13)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BookAuthor_Books");
