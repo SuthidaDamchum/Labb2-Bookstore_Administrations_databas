@@ -1,14 +1,19 @@
-﻿using System.Windows.Input;
+﻿using System.ComponentModel.Design;
+using System.Windows.Input;
 using BookStore_Domain;
 using BookStore_Infrastrcuture.Data.Model;
 using BookStore_Presentation.Command;
 using Microsoft.EntityFrameworkCore;
+using BookStore_Presentation.Command;
+using BookStore_Presentation.Services;
 
 namespace BookStore_Presentation.ViewModels
 {
     internal class MainWindowViewModel : ViewModelBase
     {
         private readonly BookStoreContext _context;
+
+     
 
         public ICommand OpenInventoryByStoreCommand { get; }
         public ICommand OpenBookAdminCommand { get; }
@@ -26,19 +31,23 @@ namespace BookStore_Presentation.ViewModels
 
       
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(BookSelectionService bookSelectionService)
 
         {
-           
+            var selectionService = new BookSelectionService();
+            
+            // Create shared BooksAdminViewModel
+            var booksVm = new BooksAdminViewModel(selectionService);
+
             _context = new BookStoreContext();
 
             OpenInventoryByStoreCommand = new DelegateCommand(_ =>
             {
-                CurrentViewModel = new InventoryByStoreViewModel(); // navigation
+                CurrentViewModel = new InventoryByStoreViewModel(selectionService, booksVm);
             });
             OpenBookAdminCommand = new DelegateCommand(_ =>
             {
-                CurrentViewModel = new BooksAdminViewModel();
+                CurrentViewModel = booksVm;
             });
 
             

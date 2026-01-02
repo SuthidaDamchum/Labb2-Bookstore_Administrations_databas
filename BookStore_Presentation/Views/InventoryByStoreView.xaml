@@ -9,20 +9,26 @@
              d:DataContext="{d:DesignInstance Type=UI:InventoryByStoreViewModel, IsDesignTimeCreatable=True}">
 
 
-
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="3*"/>
-
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Lista butiker -->
-        <ListBox ItemsSource="{Binding Stores}"
-                 SelectedItem="{Binding SelectedStore}"
-                 DisplayMemberPath="StoreName"/>
 
-        <!-- RIGHT SIDE -->
+        <StackPanel Grid.Column="0">
+            <TextBlock Text="Stores"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Margin="0,0,0,5"/>
+            <ListBox ItemsSource="{Binding Stores}"
+                 SelectedItem="{Binding SelectedStore}"
+                 DisplayMemberPath="StoreName"
+                 Width="150"
+                 Height="350"/>
+        </StackPanel>
+
+
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -35,35 +41,51 @@
 
 
 
-            <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10,10,0,10" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10,10,0,0" VerticalAlignment="Top">
                 <ComboBox ItemsSource="{Binding Books}" 
                           SelectedItem="{Binding SelectedBook}" 
                           IsTextSearchEnabled="true"
                           IsEditable="true"
                           DisplayMemberPath="Title"
-                          Width="250" Margin="0,0,10,0" SelectedIndex="1" />
+                          Width="180" Margin="0,15,10,0" SelectedIndex="1" />
 
-                <Button Content="Add Book to Store"
-            Width="120"
-            Margin="10,0,10,0"
+                <Button Content="➕Add Book to Store"
+            Width="Auto" Padding="3 3"
+
+            Margin="5,15,10,0"
             Command="{Binding AddBookToStoreCommand}"  />
 
-                <Button Content="Remove Book from Store"
-            Width="120"
+                <Button Content="🗑Remove Book from Store"
+            Width="Auto"
+            Margin="5,15,10,0" Padding="3 3"
+                     
+                         
             Command="{Binding RemoveBookFromStoreCommand}" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="10,20,0,10" VerticalAlignment="Top">
-                <Button Content="Increase Quantity" 
-            Width="120"
+                <Button Content="➕Increase Quantity" 
+            Width="Auto"  Padding="3 3" 
+        
             Margin="0,0,10,0"
             Command="{Binding IncreaseQuantityCommand}" />
-                <Button Content="Decrease Quantity" 
-            Width="120"
+                <Button Content="➖Decrease Quantity"  Padding="3 3"
+            Width="Auto"                
+              
             Command="{Binding DecreaseQuantityCommand}" />
             </StackPanel>
 
-            <DataGrid ItemsSource="{Binding Inventory}" SelectedItem="{Binding SelectedInventoryItem, Mode=TwoWay}" IsReadOnly="True" Grid.Column="1" AutoGenerateColumns="False" Margin="10,50,0,0">
+            <DataGrid ItemsSource="{Binding Inventory}"
+                  SelectedItem="{Binding SelectedInventoryItem, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserResizeRows="False"
+                  CanUserResizeColumns="False"
+                  CanUserReorderColumns="False"
+                  Margin="10,70,0,0"
+                  Grid.Column="1">
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ISBN" Binding="{Binding ISBN}" />
@@ -71,7 +93,6 @@
                     <DataGridTextColumn Header="Price" Binding="{Binding Price}" />
                     <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" />
                 </DataGrid.Columns>
-
 
             </DataGrid>
         </Grid>

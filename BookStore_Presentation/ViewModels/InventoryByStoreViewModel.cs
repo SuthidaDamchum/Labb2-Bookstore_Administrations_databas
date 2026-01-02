@@ -3,34 +3,26 @@ using System.Windows.Input;
 using BookStore_Domain;
 using BookStore_Infrastrcuture.Data.Model;
 using BookStore_Presentation.Command;
+using BookStore_Presentation.Services;
 using Microsoft.EntityFrameworkCore;
-using BookStore_Presentation.ViewModels;
 
 namespace BookStore_Presentation.ViewModels
 {
     internal class InventoryByStoreViewModel : ViewModelBase
     {
+        private readonly BookSelectionService _selectionService;
         private readonly BookStoreContext _context = new();
+        private readonly BooksAdminViewModel _bookCatalog;
 
-        private BooksAdminViewModel _bookCatalog;
         public ObservableCollection<BookAdminItem> Books => _bookCatalog.Books;
+
         public DelegateCommand IncreaseQuantityCommand { get; }
         public DelegateCommand DecreaseQuantityCommand { get; }
         public ICommand RemoveBookFromStoreCommand { get; }
+        public ICommand AddBookToStoreCommand { get; }
+
         public ObservableCollection<Store> Stores { get; private set; }
         public ObservableCollection<InventoryItem> Inventory { get; private set; } = new();
-
-        private BookAdminItem? _selectedBook;
-        public BookAdminItem? SelectedBook
-        {
-            get => _selectedBook;
-            set
-            {
-                _selectedBook = value;
-                RaisePropertyChanged();
-                ((DelegateCommand)AddBookToStoreCommand).RaiseCanExecuteChanged();
-            }
-        }
 
         private Store? _selectedStore;
         public Store? SelectedStore
@@ -52,68 +44,71 @@ namespace BookStore_Presentation.ViewModels
             {
                 _selectedInventoryItem = value;
                 RaisePropertyChanged();
-                ((DelegateCommand)IncreaseQuantityCommand).RaiseCanExecuteChanged();
-                ((DelegateCommand)DecreaseQuantityCommand).RaiseCanExecuteChanged();
+                IncreaseQuantityCommand.RaiseCanExecuteChanged();
+                DecreaseQuantityCommand.RaiseCanExecuteChanged();
                 ((DelegateCommand)RemoveBookFromStoreCommand).RaiseCanExecuteChanged();
-              
             }
         }
 
-        public InventoryByStoreViewModel()
+        // Use the shared service for SelectedBook
+        public BookAdminItem? SelectedBook
         {
-            _bookCatalog = new BooksAdminViewModel();
+            get => _selectionService.SelectedBook;
+            set
+            {
+                _selectionService.SelectedBook = value;
+                RaisePropertyChanged();
+                ((DelegateCommand)AddBookToStoreCommand).RaiseCanExecuteChanged();
+            }
+        }
+
+        public InventoryByStoreViewModel(BookSelectionService selectionService, BooksAdminViewModel booksVm)
+        {
+            _selectionService = selectionService;  // store the shared service
+            _bookCatalog = booksVm;                 // use the shared BooksAdminViewModel
 
             LoadStores();
 
             IncreaseQuantityCommand = new DelegateCommand(
-               _ =>
-               {
-                   if (SelectedInventoryItem != null)
-                   {
-                       UpdateQuantityInDatabase(SelectedInventoryItem, 1);
-                   }
-               },
-               _ => SelectedInventoryItem != null
-           );
+                _ =>
+                {
+                    if (SelectedInventoryItem != null)
+                        UpdateQuantityInDatabase(SelectedInventoryItem, 1);
+                },
+                _ => SelectedInventoryItem != null
+            );
 
             DecreaseQuantityCommand = new DelegateCommand(
                 _ =>
                 {
                     if (SelectedInventoryItem != null && SelectedInventoryItem.Quantity > 0)
-                    {
                         UpdateQuantityInDatabase(SelectedInventoryItem, -1);
-                    }
                 },
                 _ => SelectedInventoryItem != null && SelectedInventoryItem.Quantity > 0
             );
 
-            AddBookToStoreCommand = new DelegateCommand(_ =>
-            {
-                if (SelectedBook != null)
-                    AddBookToStore(SelectedBook);
-            },
-
-            _=> SelectedBook != null && SelectedStore != null 
-
+            AddBookToStoreCommand = new DelegateCommand(
+                _ =>
+                {
+                    if (SelectedBook != null)
+                        AddBookToStore(SelectedBook);
+                },
+                _ => SelectedBook != null && SelectedStore != null
             );
 
-            RemoveBookFromStoreCommand = new DelegateCommand(_ =>
-            {
-                if (SelectedInventoryItem != null)
-                    RemoveBookFromStore(SelectedInventoryItem);
-
-            },
-            _=> SelectedInventoryItem != null && SelectedStore != null
-            
-            
+            RemoveBookFromStoreCommand = new DelegateCommand(
+                _ =>
+                {
+                    if (SelectedInventoryItem != null)
+                        RemoveBookFromStore(SelectedInventoryItem);
+                },
+                _ => SelectedInventoryItem != null && SelectedStore != null
             );
         }
 
-        public ICommand AddBookToStoreCommand { get; }
-
         private void AddBookToStore(BookAdminItem book)
         {
-            if (SelectedStore == null || book == null) return;
+            if (SelectedStore == null) return;
 
             var inventory = _context.Inventories
                 .FirstOrDefault(i => i.Isbn13 == book.Isbn13 && i.StoreId == SelectedStore.StoreId);
@@ -124,31 +119,33 @@ namespace BookStore_Presentation.ViewModels
                 {
                     Isbn13 = book.Isbn13,
                     StoreId = SelectedStore.StoreId,
-                    Quantity = 1 
+                    Quantity = 1
                 });
             }
             else
             {
                 inventory.Quantity++;
             }
+
             _context.SaveChanges();
             LoadInventory();
         }
+
         private void RemoveBookFromStore(InventoryItem item)
         {
             if (SelectedStore == null || item == null) return;
 
             var inventory = _context.Inventories
-             .FirstOrDefault(i => i.Isbn13 == item.ISBN 
-                                                      && i.StoreId == SelectedStore.StoreId);
+                .FirstOrDefault(i => i.Isbn13 == item.ISBN && i.StoreId == SelectedStore.StoreId);
+
             if (inventory != null)
             {
                 _context.Inventories.Remove(inventory);
                 _context.SaveChanges();
                 LoadInventory();
             }
-        }    
-        
+        }
+
         private void UpdateQuantityInDatabase(InventoryItem item, int delta)
         {
             var inventory = _context.Inventories
@@ -156,13 +153,12 @@ namespace BookStore_Presentation.ViewModels
 
             if (inventory != null)
             {
-                inventory.Quantity = item.Quantity;
+                inventory.Quantity += delta;
                 _context.SaveChanges();
-                // uppdatera UI
                 item.Quantity += delta;
             }
         }
-        
+
         private void LoadStores()
         {
             Stores = new ObservableCollection<Store>(_context.Stores.ToList());
@@ -185,7 +181,6 @@ namespace BookStore_Presentation.ViewModels
                         Price = i.Isbn13Navigation.Price ?? 0m,
                         Quantity = i.Quantity,
                         StoreId = i.StoreId
-
                     }).ToList()
             );
             RaisePropertyChanged(nameof(Inventory));

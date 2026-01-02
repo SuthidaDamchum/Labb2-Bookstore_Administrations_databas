@@ -1,17 +1,6 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using BookStore_Domain;
-using BookStore_Infrastrcuture.Data.Model;
+﻿using System.Windows;
+using BookStore_Presentation.Services;
 using BookStore_Presentation.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace BookStore_Presentation
 {
@@ -24,8 +13,8 @@ namespace BookStore_Presentation
         public MainWindow()
         {
             InitializeComponent();
-
-            DataContext = new MainWindowViewModel();
+            var bookSelectionService = new BookSelectionService();
+            DataContext = new MainWindowViewModel(bookSelectionService);
 
         }
     }
