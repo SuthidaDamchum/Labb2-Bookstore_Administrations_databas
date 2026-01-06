@@ -14,7 +14,6 @@ namespace BookStore_Presentation
             var bookSelectionService = new BookSelectionService();
             var authorService = new AuthorService(new BookStoreContext());
 
-         
             var mainWindowViewModel = new MainWindowViewModel(bookSelectionService, authorService);
 
             var mainWindow = new MainWindow
@@ -22,6 +21,7 @@ namespace BookStore_Presentation
                 DataContext = mainWindowViewModel
             };
 
+            //mainWindow.Show();
         }
     }
 }

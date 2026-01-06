@@ -36,7 +36,6 @@ namespace BookStore_Presentation.Services
             return author;
         }
 
-
         public Author UpdateAuthor(int authorId, string firstName, string lastName, DateOnly? birthday)
         {
             var author = _context.Authors.Find(authorId);
@@ -58,7 +57,6 @@ namespace BookStore_Presentation.Services
                     
             .Include(a => a.BookAuthors)
             .FirstOrDefault(a => a.AuthorId == authorId);
-
 
             if (author == null)
                 throw new Exception("Author not found.");

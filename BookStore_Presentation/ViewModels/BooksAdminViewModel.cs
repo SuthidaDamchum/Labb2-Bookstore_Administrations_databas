@@ -9,21 +9,19 @@ using BookStore_Presentation.Models;
 using BookStore_Presentation.Services;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace BookStore_Presentation.ViewModels
 {
     public class BooksAdminViewModel : ViewModelBase
     {
 
         private readonly BookSelectionService _selectionService;
-  
+
         private readonly AuthorService _authorService = new AuthorService(new BookStoreContext());
 
         private readonly BookStoreContext _context;
         public ObservableCollection<BookAdminItem> Books { get; }
         public ICommand DeleteBookFromInventoryCommand { get; }
         public ICommand CreateNewBookTitleCommand { get; }
-
         public ICommand EditNewBookTitleCommand { get; }
         public ICommand CreateNewAuthorCommand { get; }
 
@@ -32,14 +30,15 @@ namespace BookStore_Presentation.ViewModels
         {
 
             _authorService = authorService;
-
             _selectionService = selectionService;
             _context = new BookStoreContext();
+
             Books = new ObservableCollection<BookAdminItem>(LoadBooks());
 
             CreateNewBookTitleCommand = new DelegateCommand(_ => OpenAddBookDialog());
 
             CreateNewAuthorCommand = new DelegateCommand(_ => OpenAddNewAuthorDialog());
+
 
             //EditNewBookTitleCommand = new Delegate(_ => EditNewBookTitle(), _ => SelectedBook != null);
 
@@ -48,7 +47,7 @@ namespace BookStore_Presentation.ViewModels
                 {
                     if (param is BookAdminItem book)
                     {
-                    
+
                         var result = MessageBox.Show(
                           $"Are you sure you want to delete the book '{book.Title}'?",
                           "Confirm Delete",
@@ -58,10 +57,10 @@ namespace BookStore_Presentation.ViewModels
 
                         if (result == MessageBoxResult.Yes)
                         {
-                       
+
                             DeleteBookFromInventory(book);
 
-                         
+
                             ReloadBooks();
                         }
                     }
@@ -82,7 +81,9 @@ namespace BookStore_Presentation.ViewModels
 
         private void OpenAddBookDialog()
         {
-            var dialog = new AddNewTitleDailog(this); // pass the current ViewModel
+        
+            var addNewTitleViewModel = new AddNewTitleViewModel();
+            var dialog = new AddNewTitleDailog(addNewTitleViewModel); 
 
             if (dialog.ShowDialog() == true)
             {
@@ -123,8 +124,7 @@ namespace BookStore_Presentation.ViewModels
                PublicationDate = b.PublicationDate,
                PageCount = b.PageCount,
 
-               PublisherName = b.Publisher != null? b.Publisher.PublisherName : "",
-
+               PublisherName = b.Publisher != null ? b.Publisher.PublisherName : "",
 
            })
            .ToList();
@@ -187,7 +187,7 @@ namespace BookStore_Presentation.ViewModels
             if (publisherId != null)
             {
                 var publisher = _context.Publishers.Find(publisherId);
-                if(publisher != null)
+                if (publisher != null)
                 {
                     publisherName = publisher.PublisherName;
                 }
@@ -210,24 +210,24 @@ namespace BookStore_Presentation.ViewModels
             RaisePropertyChanged(nameof(Books));
         }
 
-        private void EditNewBookTitle()
-        {
-            if(SelectedBook == null) return;
+            private void EditNewBookTitle()
+            {
+                if (SelectedBook == null) return;
 
-        }
+            }
 
-        public void DeleteBookFromInventory(BookAdminItem bookItem)
-        {
-            if (bookItem == null) return;
+            public void DeleteBookFromInventory(BookAdminItem bookItem)
+            {
+                if (bookItem == null) return;
 
-  
+
 
             var book = _context.Books
                  .Include(b => b.BookAuthors)   //include related authors for EF
                 .FirstOrDefault(b => b.Isbn13 == bookItem.Isbn13);
 
             if (book != null)
-   
+
             {
                 if (book.BookAuthors != null && book.BookAuthors.Any())
                 {
@@ -246,27 +246,41 @@ namespace BookStore_Presentation.ViewModels
             }
         }
 
-        private void OpenAddNewAuthorDialog()
-        {
-            var dialog = new AddNewAuthorDialog
+            private void OpenAddNewAuthorDialog()
             {
-                Owner = Application.Current.MainWindow
-            };
+                var dialog = new AddNewAuthorDialog
+                {
+                    Owner = Application.Current.MainWindow
+                };
 
-            if (dialog.ShowDialog() != true)
-                return;
+                if (dialog.ShowDialog() != true)
+                    return;
 
-            var dto = dialog.Author;
-            if (dto == null) return;
+                var dto = dialog.Author;
+                if (dto == null) return;
 
-            //skapa författaren via AuthorService
-            var newAuthor = _authorService.CreateAuthor(dto.FirstName, dto.LastName, dto.BirthDay);
-
-        
-
+                var newAuthor = _authorService.CreateAuthor(dto.FirstName, dto.LastName, dto.BirthDay);
+            }
         }
-    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

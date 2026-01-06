@@ -73,7 +73,6 @@ namespace BookStore_Presentation.ViewModels
         {
             var dialog = new AddNewAuthorDialog
             {
-                Owner = Application.Current.MainWindow
             };
 
             if (dialog.ShowDialog() != true)
@@ -107,7 +106,6 @@ namespace BookStore_Presentation.ViewModels
 
             var dialog = new EditNewAuthorDialog
             {
-                Owner = Application.Current.MainWindow,
                 DataContext = new AddNewAuthorViewModel
                 {
                     FirstName = SelectedAuthor.FullName.Split(' ')[0],
@@ -132,7 +130,6 @@ namespace BookStore_Presentation.ViewModels
             );
             _context.SaveChanges();
 
-            //UpdateUI 
             SelectedAuthor.FullName = updateAuthor.FirstName + " " + updateAuthor.LastName;
             SelectedAuthor.BirthDay = updateAuthor.BirthDay;
 
@@ -160,6 +157,8 @@ namespace BookStore_Presentation.ViewModels
                 _authorService.DeleteAuthor(SelectedAuthor.AuthorId);
 
                 Authors.Remove(SelectedAuthor);
+
+                SelectedAuthor = null;
 
             }
 

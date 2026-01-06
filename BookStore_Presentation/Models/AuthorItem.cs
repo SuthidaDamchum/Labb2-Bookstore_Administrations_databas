@@ -38,7 +38,11 @@ namespace BookStore_Presentation.Models
         public bool IsSelected
         {
             get => _isSelected;
-            set { _isSelected = value; RaisePropertyChanged(); }
+            set
+            {
+                _isSelected = value; RaisePropertyChanged();
+                RaisePropertyChanged(nameof(IsSelected));
+            }
         }
     }
 }
