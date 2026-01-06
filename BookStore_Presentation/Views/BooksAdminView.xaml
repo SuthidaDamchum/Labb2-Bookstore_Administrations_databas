@@ -94,6 +94,9 @@
                 <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" Width="120"/>
                 <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="100"/>
                 <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat=F2}" Width="80"/>
+                <DataGridTextColumn Header="Publication Date" Binding="{Binding PublicationDate}" Width="100"/>
+                <DataGridTextColumn Header="Pages" Binding="{Binding PageCount}" Width="100"/>
+
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

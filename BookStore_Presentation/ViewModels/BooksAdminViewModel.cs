@@ -114,10 +114,18 @@ namespace BookStore_Presentation.ViewModels
                ba.Author.FirstName + " " + ba.Author.LastName)),
                Genre = b.Genre != null ? b.Genre.GenreName : "",
                Language = b.Language,
-               Price = b.Price ?? 0m
+               Price = b.Price ?? 0m,
+               PublicationDate = b.PublicationDate,
+               PageCount = b.PageCount
+
+
            })
            .ToList();
         }
+
+
+
+
 
         public List<string> LanguageOptions { get; } = new List<string>
 
@@ -127,7 +135,7 @@ namespace BookStore_Presentation.ViewModels
         public void CreateNewBookTitle
          (
             string isbn13, string title, int? genreId,
-            string language, decimal price, List<int> existingAuthorIds
+            string language, decimal price, DateOnly? publicationdate, int pagecount,  List<int> existingAuthorIds
          )
 
         {
@@ -147,6 +155,9 @@ namespace BookStore_Presentation.ViewModels
                 GenreId = genreId,
                 Language = language,
                 Price = price,
+                PublicationDate = publicationdate,
+                PageCount = pagecount,
+
 
                 BookAuthors = authors.Select(a => new BookAuthor
                 {
@@ -174,8 +185,9 @@ namespace BookStore_Presentation.ViewModels
                 AuthorNames = string.Join(", ", authors.Select(a => $"{a.FirstName} {a.LastName}")),
                 Genre = newBookTitle.Genre != null ? newBookTitle.Genre.GenreName : "",
                 Language = newBookTitle.Language,
-                Price = newBookTitle.Price ?? 0m
-
+                Price = newBookTitle.Price ?? 0m,
+                PublicationDate = newBookTitle.PublicationDate,
+                PageCount = newBookTitle.PageCount
 
             });
             RaisePropertyChanged(nameof(Books));
