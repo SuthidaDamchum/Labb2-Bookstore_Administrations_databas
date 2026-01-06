@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using BookStore_Domain;
@@ -38,9 +39,7 @@ namespace BookStore_Presentation.Dialogs
                     AuthorId = a.AuthorId,
                     FullName = a.FirstName + " " + a.LastName
                 }));
-
-
-
+            
             AuthorsComboBox.ItemsSource = _authors;
         }
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -58,7 +57,6 @@ namespace BookStore_Presentation.Dialogs
                 MessageBox.Show("ISBN is required and must be alphanumeric.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
 
             var selectedAuthors = _authors
                 .Where(a => a.IsSelected)
@@ -79,22 +77,47 @@ namespace BookStore_Presentation.Dialogs
             }
 
 
-            if (string.IsNullOrWhiteSpace(PriceTextBox.Text)
-                            || !decimal.TryParse(PriceTextBox.Text, out var p))
+            if(!decimal.TryParse(PriceTextBox.Text, NumberStyles.Currency, CultureInfo.InvariantCulture, out var price))
             {
-                MessageBox.Show("Price is required and must be a valid number.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Invalid price.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            decimal price = p;
+            DateOnly? publicationDate = null;
+            if (!string.IsNullOrWhiteSpace(PublicationDateTextBox.Text))
+            {
+                if (DateOnly.TryParseExact(PublicationDateTextBox.Text, "yyyy-MM-dd", CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out var date))
+                    publicationDate = date;
+                else
+                {
+                    MessageBox.Show("Invalid publication date. Use YYYY-MM-DD.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
 
-            var newBook = new Book
+            int? pageCount = null;
+            if (!string.IsNullOrWhiteSpace(PageCountTextBox.Text))
+            {
+                if (int.TryParse(PageCountTextBox.Text, out var pages))
+                    pageCount = pages;
+                else
+                {
+                    MessageBox.Show("Invalid page count", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
+                var newBook = new Book
             {
                 Isbn13 = IsbnTextBox.Text,
                 Title = TitleTextBox.Text,
-                Language = language,  
+                Language = LanguageComboBox.Text,
                 Price = price,
                 GenreId = (GenreComboBox.SelectedItem as Genre)?.GenreId,
+                PublicationDate = publicationDate,
+                PageCount = pageCount,
+
                 BookAuthors = selectedAuthors.Select(a => new BookAuthor
                 {
                     AuthorId = a.AuthorId,
@@ -103,7 +126,6 @@ namespace BookStore_Presentation.Dialogs
                 }).ToList()
             };
 
-            // 5️⃣ Save to database
             _context.Books.Add(newBook);
             _context.SaveChanges();
 
@@ -134,6 +156,5 @@ namespace BookStore_Presentation.Dialogs
     }
 }
        
-
 
     
