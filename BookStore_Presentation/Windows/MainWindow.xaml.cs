@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using BookStore_Infrastrcuture.Data.Model;
 using BookStore_Presentation.Services;
 using BookStore_Presentation.ViewModels;
 
@@ -13,8 +14,12 @@ namespace BookStore_Presentation
         public MainWindow()
         {
             InitializeComponent();
+            var context = new BookStoreContext();
             var bookSelectionService = new BookSelectionService();
-            DataContext = new MainWindowViewModel(bookSelectionService);
+            var authorService = new AuthorService(context);
+
+            // Pass them to MainWindowViewModel
+            DataContext = new MainWindowViewModel(bookSelectionService, authorService);
 
         }
     }
