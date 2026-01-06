@@ -6,103 +6,129 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:UI="clr-namespace:BookStore_Presentation.ViewModels"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance Type=UI:InventoryByStoreViewModel, IsDesignTimeCreatable=True}">
+             d:DataContext="{d:DesignInstance Type=UI:InventoryByStoreViewModel, IsDesignTimeCreatable=False}">
 
 
-    <Grid Margin="10">
+    <Grid Margin="15">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
+            <!-- LEFT NAV -->
+            <ColumnDefinition Width="220"/>
+            <!-- MAIN CONTENT -->
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
+        <!-- ================= LEFT PANEL ================= -->
+        <Border Grid.Column="0"
+                Padding="12"
+                CornerRadius="6"
+                Background="#F5F5F5"
+                BorderBrush="#D0D0D0"
+                BorderThickness="1">
 
-        <StackPanel Grid.Column="0">
-            <TextBlock Text="Stores"
-                   FontSize="16"
-                   FontWeight="Bold"
-                   Margin="0,0,0,5"/>
-            <ListBox ItemsSource="{Binding Stores}"
-                 SelectedItem="{Binding SelectedStore}"
-                 DisplayMemberPath="StoreName"
-                 Width="150"
-                 Height="350"/>
-        </StackPanel>
+            <StackPanel>
 
+                <TextBlock Text="Stores"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,8"/>
 
-        <Grid Grid.Column="1">
+                <ListBox ItemsSource="{Binding Stores}"
+                         SelectedItem="{Binding SelectedStore}"
+                         DisplayMemberPath="StoreName"
+                         Height="150"
+                         Margin="0,0,0,15"/>
+
+                <Separator Margin="0,0,0,15"/>
+
+                <TextBlock Text="Inventory Quantity"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,8"/>
+
+                <Button Content="➕ Increase Quantity"
+                        Margin="0,0,0,6"
+                        Padding="8"
+                        Command="{Binding IncreaseQuantityCommand}"/>
+
+                <Button Content="➖ Decrease Quantity"
+                        Padding="8"
+                        Command="{Binding DecreaseQuantityCommand}"/>
+
+            </StackPanel>
+        </Border>
+
+        <!-- ================= RIGHT PANEL ================= -->
+        <Grid Grid.Column="1" Margin="15,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <!-- Add/Remove -->
-                <RowDefinition Height="Auto"/>
-                <!-- Increase/Decrease -->
                 <RowDefinition Height="*"/>
-                <!-- DataGrid -->
             </Grid.RowDefinitions>
 
+            <!-- ADD BOOK SECTION -->
+            <Border Grid.Row="0"
+                    Padding="12"
+                    CornerRadius="6"
+                    Background="#FFFFFF"
+                    BorderBrush="#D0D0D0"
+                    BorderThickness="1"
+                    Margin="0,0,0,12">
 
+                <StackPanel>
 
-            <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10,10,0,0" VerticalAlignment="Top">
-                <ComboBox ItemsSource="{Binding Books}" 
-                          SelectedItem="{Binding SelectedBook}" 
-                          IsTextSearchEnabled="true"
-                          IsEditable="true"
-                          DisplayMemberPath="Title"
-                          Width="180" Margin="0,15,10,0" SelectedIndex="1" />
+                    <TextBlock Text="Add Books to Store"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,10"/>
 
-                <Button Content="➕Add Book to Store"
-            Width="Auto" Padding="3 3"
+                    <ComboBox ItemsSource="{Binding AvailableBooks}"
+                              SelectedItem="{Binding SelectedBook}"
+                              DisplayMemberPath="Title"
+                              Height="30"
+                              IsEditable="True"
+                              IsTextSearchEnabled="True"
+                              Margin="0,0,0,10"/>
 
-            Margin="5,15,10,0"
-            Command="{Binding AddBookToStoreCommand}"  />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="➕ Add to Store"
+                                Width="140"
+                                Margin="0,0,8,0"
+                                Padding="8"
+                                Command="{Binding AddBookToStoreCommand}"/>
 
-                <Button Content="🗑Remove Book from Store"
-            Width="Auto"
-            Margin="5,15,10,0" Padding="3 3"
-                     
-                         
-            Command="{Binding RemoveBookFromStoreCommand}" />
-            </StackPanel>
+                        <Button Content="🗑 Remove from Store"
+                                Width="160"
+                                Padding="8"
+                                Command="{Binding RemoveBookFromStoreCommand}"/>
+                    </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="10,20,0,10" VerticalAlignment="Top">
-                <Button Content="➕Increase Quantity" 
-            Width="Auto"  Padding="3 3" 
-        
-            Margin="0,0,10,0"
-            Command="{Binding IncreaseQuantityCommand}" />
-                <Button Content="➖Decrease Quantity"  Padding="3 3"
-            Width="Auto"                
-              
-            Command="{Binding DecreaseQuantityCommand}" />
-            </StackPanel>
+                </StackPanel>
+            </Border>
 
-            <DataGrid ItemsSource="{Binding Inventory}"
-                  SelectedItem="{Binding SelectedInventoryItem, Mode=TwoWay}"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  CanUserResizeRows="False"
-                  CanUserResizeColumns="False"
-                  CanUserReorderColumns="False"
-                  Margin="10,70,0,0"
-                  Grid.Column="1">
+            <!-- INVENTORY GRID -->
+            <Border Grid.Row="1"
+                    Padding="8"
+                    CornerRadius="6"
+                    Background="#FFFFFF"
+                    BorderBrush="#D0D0D0"
+                    BorderThickness="1">
 
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ISBN" Binding="{Binding ISBN}" />
-                    <DataGridTextColumn Header="Title" Binding="{Binding Title}" />
-                    <DataGridTextColumn Header="Price" Binding="{Binding Price}" />
-                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" />
-                </DataGrid.Columns>
+                <DataGrid ItemsSource="{Binding Inventory}"
+                          SelectedItem="{Binding SelectedInventoryItem}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal">
 
-            </DataGrid>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ISBN" Binding="{Binding ISBN}" Width="110"/>
+                        <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="150"/>
+                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="*"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+            </Border>
+
         </Grid>
     </Grid>
 </UserControl>
-
-
-<!-- Buttons Row -->
-<!--
-<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="0" Margin="10,0,0,300">
-    <Button Content="Increase Quantity" Width="103" Height="25" Margin="0,0,10,0" Command="{Binding IncreaseQuantityCommand}"/>
-    <Button Content="Decrease Quantity" Width="105" Height="25" Command="{Binding DecreaseQuantityCommand}" />
-</StackPanel>-->

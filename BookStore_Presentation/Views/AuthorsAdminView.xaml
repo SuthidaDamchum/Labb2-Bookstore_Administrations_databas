@@ -1,0 +1,92 @@
+﻿<UserControl x:Class="BookStore_Presentation.Views.AuthorsAdminView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BookStore_Presentation.Views" 
+             xmlns:viewmodels="clr-namespace:BookStore_Presentation.ViewModels"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=viewmodels:AuthorsAdminViewModel, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+       <Style x:Key="ToolbarButtonStyle" TargetType="Button">
+    <Setter Property="Margin" Value="0,0,5,0"/>
+    <Setter Property="Padding" Value="6,4"/>
+    <Setter Property="FontSize" Value="13"/>
+    <Setter Property="Foreground" Value="White"/>
+    <Setter Property="Background" Value="#666"/>
+    <Setter Property="BorderBrush" Value="#555"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="Button">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4">
+                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#777"/>
+                    </Trigger>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="#555"/>
+                    </Trigger>
+                    <!-- New trigger for disabled -->
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="#999"/>
+                        <Setter Property="Foreground" Value="#CCC"/>
+                        <Setter Property="Cursor" Value="Arrow"/>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0 0 0 10" HorizontalAlignment="Left">
+            <Button Command="{Binding AddAuthorCommand}" Width="120" Style="{StaticResource ToolbarButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="➕" Margin="0,0,5,0"/>
+                    <TextBlock Text="Add Author"/>
+                </StackPanel>
+            </Button>
+
+            <Button Command="{Binding EditAuthorCommand}" Width="120" Style="{StaticResource ToolbarButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="✏" Margin="0,0,5,0"/>
+                    <TextBlock Text="Edit Author"/>
+                </StackPanel>
+            </Button>
+
+            <Button Command="{Binding DeleteAuthorCommand}" Width="120" Style="{StaticResource ToolbarButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="🗑" Margin="0,0,5,0"/>
+                    <TextBlock Text="Delete Author"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <!-- DataGrid -->
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Authors}" AutoGenerateColumns="False" 
+                  SelectedItem="{Binding SelectedAuthor, Mode=TwoWay}" IsReadOnly="True"
+                  CanUserAddRows="False" CanUserDeleteRows="False" Margin="0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding AuthorId}" Width="50"/>
+                <DataGridTextColumn Header="Full Name" Binding="{Binding FullName}" Width="*"/>
+                <DataGridTextColumn Header="Books" Binding="{Binding BooksCount}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>
