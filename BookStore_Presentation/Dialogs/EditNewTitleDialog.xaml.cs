@@ -11,7 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-
+using BookStore_Presentation.Models;
 namespace BookStore_Presentation.Dialogs
 {
     /// <summary>
@@ -19,34 +19,13 @@ namespace BookStore_Presentation.Dialogs
     /// </summary>
     public partial class EditNewTitleDialog : Window
     {
+
+        public CreateNewTitleDto? Book { get; private set; }
         public EditNewTitleDialog()
         {
             InitializeComponent();
         }
 
-
-
-
-
-        private void OkButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void AuthorCheckBox_Changed(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
-    }
+}
 

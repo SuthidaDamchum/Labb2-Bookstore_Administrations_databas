@@ -11,7 +11,7 @@
         ResizeMode="NoResize"
         d:DataContext="{d:DesignInstance Type=viewmodels:AddNewTitleViewModel, IsDesignTimeCreatable=True}">
 
-    <Grid Margin="5">
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="599*"/>
             <RowDefinition Height="75*"/>
@@ -34,7 +34,7 @@
           IsReadOnly="True"
           StaysOpenOnEdit="True"
           HorizontalAlignment="Left"
-          Width="270"
+          Width="280"
           MaxDropDownHeight="200"
           Text="{Binding SelectedAuthorsText, Mode=OneWay}">
                 <ComboBox.ItemTemplate>
