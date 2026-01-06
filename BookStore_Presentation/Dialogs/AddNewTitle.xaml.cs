@@ -1,7 +1,9 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Controls;
 using BookStore_Domain;
 using BookStore_Infrastrcuture.Data.Model;
+using BookStore_Presentation.Models;
 using BookStore_Presentation.ViewModels;
 
 namespace BookStore_Presentation.Dialogs
@@ -12,33 +14,35 @@ namespace BookStore_Presentation.Dialogs
     public partial class AddNewTitle : Window
     {
         private readonly BookStoreContext _context;
+        private readonly BooksAdminViewModel _viewModel;
+        private ObservableCollection<AuthorItem> _authors;
 
-        public AddNewTitle()
+        // Receive existing ViewModel
+        public AddNewTitle(BooksAdminViewModel viewModel)
         {
-
             InitializeComponent();
+
             _context = new BookStoreContext();
 
-            DataContext = new BooksAdminViewModel();
+            _viewModel = viewModel; // use the existing ViewModel
+
+            DataContext = _viewModel;
 
 
             GenreComboBox.ItemsSource = _context.Genres.ToList();
 
-            AuthorsListBox.ItemsSource = _context.Authors
 
-                .Select(a => new AuthorItem
+            _authors = new ObservableCollection<AuthorItem>(
+                _context.Authors.Select(a => new AuthorItem
                 {
                     AuthorId = a.AuthorId,
                     FullName = a.FirstName + " " + a.LastName
-                })
-
-                .ToList();
+                }));
 
 
-            AuthorsListBox.SelectionMode = SelectionMode.Multiple;
+
+            AuthorsComboBox.ItemsSource = _authors;
         }
-
-
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -56,13 +60,16 @@ namespace BookStore_Presentation.Dialogs
             }
 
 
-            var selectedAuthors = AuthorsListBox.SelectedItems.Cast<AuthorItem>().ToList();
+            var selectedAuthors = _authors
+                .Where(a => a.IsSelected)
+                .ToList();
+
             if (!selectedAuthors.Any())
             {
                 MessageBox.Show("Please select at least one author.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-                
+
 
             var language = LanguageComboBox.SelectedItem as string;
             if (string.IsNullOrEmpty(language))
@@ -72,7 +79,7 @@ namespace BookStore_Presentation.Dialogs
             }
 
 
-            if (string.IsNullOrWhiteSpace(PriceTextBox.Text) 
+            if (string.IsNullOrWhiteSpace(PriceTextBox.Text)
                             || !decimal.TryParse(PriceTextBox.Text, out var p))
             {
                 MessageBox.Show("Price is required and must be a valid number.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -104,5 +111,29 @@ namespace BookStore_Presentation.Dialogs
             DialogResult = true;
             Close();
         }
+
+        private void AuthorCheckBox_Changed(object sender, RoutedEventArgs e)
+        {
+            // Update the ComboBox text to show all selected authors
+            AuthorsComboBox.Text = SelectedAuthorsText;
+        }
+
+        public string SelectedAuthorsText
+        {
+            get
+            {
+                return string.Join(", ", _authors.Where(a => a.IsSelected).Select(a => a.FullName));
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+            Close();
+        }
     }
 }
+       
+
+
+    

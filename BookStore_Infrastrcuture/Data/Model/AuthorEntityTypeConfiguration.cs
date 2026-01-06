@@ -12,7 +12,7 @@ public class AuthorEntityTypeConfiguration : IEntityTypeConfiguration<Author>
             builder.HasKey(e => e.AuthorId).HasName("PK__Authors__86516BCF744ECEB0");
 
             builder.Property(e => e.AuthorId).HasColumnName("author_id");
-            builder.Property(e => e.BirthDate).HasColumnName("birth_date");
+            builder.Property(e => e.BirthDay).HasColumnName("birth_date");
             builder.Property(e => e.FirstName)
                 .HasMaxLength(50)
                 .HasColumnName("first_name");
