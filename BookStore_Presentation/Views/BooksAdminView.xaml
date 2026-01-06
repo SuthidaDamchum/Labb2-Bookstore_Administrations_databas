@@ -2,50 +2,96 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
              xmlns:local="clr-namespace:BookStore_Presentation.Views" 
-              xmlns:viewmodels="clr-namespace:BookStore_Presentation.ViewModels"
+             xmlns:viewmodels="clr-namespace:BookStore_Presentation.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=viewmodels:BooksAdminViewModel}">
+             d:DataContext="{d:DesignInstance Type=viewmodels:BooksAdminViewModel, IsDesignTimeCreatable=False}">
 
-
+    <UserControl.Resources>
+        <!-- Toolbar button style (gray) -->
+        <Style x:Key="ToolbarButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="0,0,5,0"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#666"/>
+            <Setter Property="BorderBrush" Value="#555"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#777"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#555"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Knappen -->
             <RowDefinition Height="*"/>
-            <!-- DataGrid -->
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10 10 10 10"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" >
+        <!-- Toolbar -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10" HorizontalAlignment="Left">
+            <Button Command="{Binding CreateNewBookTitleCommand}" Width="120" Style="{StaticResource ToolbarButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="➕" Margin="0,0,5,0"/>
+                    <TextBlock Text="Add Book"/>
+                </StackPanel>
+            </Button>
 
-            <Button Content="➕Add new book" 
-               Margin="10 10 10 10" Padding="3,3" Command="{Binding CreateNewBookTitleCommand }" />
+            <Button Command="" Width="120" Style="{StaticResource ToolbarButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="✏" Margin="0,0,5,0"/>
+                    <TextBlock Text="Edit Book"/>
+                </StackPanel>
+            </Button>
 
-            <Button Content="✏ Edit book detail" Margin="10 10 10 10"
-             Padding="3,3" Command="" />
-
-            <Button Content="🗑Delete book" Margin="10 10 10 10"
-             Padding="3,3" Command="{Binding DeleteBookFromInventoryCommand}" 
-             CommandParameter="{Binding SelectedBook}" />
+            <Button Command="{Binding DeleteBookFromInventoryCommand}" 
+                    CommandParameter="{Binding SelectedBook}" Width="120" Style="{StaticResource ToolbarButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="🗑" Margin="0,0,5,0"/>
+                    <TextBlock Text="Delete Book"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
 
+        <!-- DataGrid -->
         <DataGrid Grid.Row="1"
-              ItemsSource="{Binding Books}" 
-              AutoGenerateColumns="False" 
-              IsReadOnly="False" 
-              CanUserAddRows="False" 
-              FontSize="10"
-              SelectedItem="{Binding SelectedBook, Mode=TwoWay}"> 
+                  ItemsSource="{Binding Books}" 
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserResizeRows="False"
+                  CanUserResizeColumns="False"
+                  CanUserReorderColumns="False"
+                  FontSize="12"
+                  SelectedItem="{Binding SelectedBook, Mode=TwoWay}">
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ISBN" Binding="{Binding Isbn13}" IsReadOnly="True" Width="130"/>
-                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="130"/>
-                <DataGridTextColumn Header="Author" Binding="{Binding AuthorNames}" IsReadOnly="True" Width="120"/>
-                <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" IsReadOnly="True" Width="120"/>
+                <DataGridTextColumn Header="ISBN" Binding="{Binding Isbn13}" Width="120"/>
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="150"/>
+                <DataGridTextColumn Header="Author" Binding="{Binding AuthorNames}" Width="150"/>
+                <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" Width="120"/>
                 <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="100"/>
                 <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat=F2}" Width="80"/>
             </DataGrid.Columns>
