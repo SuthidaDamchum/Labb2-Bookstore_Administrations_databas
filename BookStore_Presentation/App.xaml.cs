@@ -22,7 +22,6 @@ namespace BookStore_Presentation
                 DataContext = mainWindowViewModel
             };
 
-            mainWindow.Show();
         }
     }
 }
