@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Runtime.Serialization.DataContracts;
 using System.Windows;
 using System.Windows.Input;
 using BookStore_Domain;
@@ -8,6 +9,7 @@ using BookStore_Presentation.Dialogs;
 using BookStore_Presentation.Models;
 using BookStore_Presentation.Services;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace BookStore_Presentation.ViewModels
 {
@@ -26,6 +28,9 @@ namespace BookStore_Presentation.ViewModels
         public ICommand CreateNewAuthorCommand { get; }
 
 
+        public List<Genre> Genres { get; }
+        public List<Publisher> Publishers { get; }
+
         public BooksAdminViewModel(BookSelectionService selectionService, AuthorService authorService)
         {
 
@@ -33,14 +38,20 @@ namespace BookStore_Presentation.ViewModels
             _selectionService = selectionService;
             _context = new BookStoreContext();
 
+           
+            Genres = _context.Genres.AsNoTracking().ToList();
+            Publishers = _context.Publishers.AsNoTracking().ToList();
+
             Books = new ObservableCollection<BookAdminItem>(LoadBooks());
 
             CreateNewBookTitleCommand = new DelegateCommand(_ => OpenAddBookDialog());
 
             CreateNewAuthorCommand = new DelegateCommand(_ => OpenAddNewAuthorDialog());
 
+            EditNewBookTitleCommand = new DelegateCommand(
+                _=> EditNewBookTitle(), 
+                _=> SelectedBook != null);
 
-            //EditNewBookTitleCommand = new Delegate(_ => EditNewBookTitle(), _ => SelectedBook != null);
 
             DeleteBookFromInventoryCommand = new DelegateCommand(
                param =>
@@ -65,7 +76,7 @@ namespace BookStore_Presentation.ViewModels
                         }
                     }
                 },
-                  param => param is BookAdminItem //CanExecute: only if a book is selected
+                  param => param is BookAdminItem 
           );
         }
 
@@ -76,14 +87,16 @@ namespace BookStore_Presentation.ViewModels
             {
                 _selectionService.SelectedBook = value;
                 RaisePropertyChanged();
+                ((DelegateCommand)EditNewBookTitleCommand).RaiseCanExecuteChanged();
+                ((DelegateCommand)DeleteBookFromInventoryCommand).RaiseCanExecuteChanged();
             }
         }
 
         private void OpenAddBookDialog()
         {
-        
+
             var addNewTitleViewModel = new AddNewTitleViewModel();
-            var dialog = new AddNewTitleDailog(addNewTitleViewModel); 
+            var dialog = new AddNewTitleDailog(addNewTitleViewModel);
 
             if (dialog.ShowDialog() == true)
             {
@@ -113,7 +126,7 @@ namespace BookStore_Presentation.ViewModels
                Isbn13 = b.Isbn13,
                Title = b.Title,
 
-               AuthorNames = string.Join(", ",
+               AuthorNameString = string.Join(", ",
                b.BookAuthors.Select(ba =>
                ba.Author.FirstName + " " + ba.Author.LastName)),
 
@@ -125,7 +138,7 @@ namespace BookStore_Presentation.ViewModels
                PageCount = b.PageCount,
 
                PublisherName = b.Publisher != null ? b.Publisher.PublisherName : "",
-
+               AuthorIds = b.BookAuthors.Select(b => b.AuthorId).ToArray()
            })
            .ToList();
         }
@@ -169,6 +182,7 @@ namespace BookStore_Presentation.ViewModels
                     AuthorId = a.AuthorId
                 }).ToList()
             };
+
             _context.Books.Add(newBookTitle);
             _context.SaveChanges();
 
@@ -198,28 +212,83 @@ namespace BookStore_Presentation.ViewModels
             {
                 Isbn13 = newBookTitle.Isbn13,
                 Title = newBookTitle.Title,
-                AuthorNames = string.Join(", ", authors.Select(a => $"{a.FirstName} {a.LastName}")),
+                AuthorNameString = string.Join(", ", authors.Select(a => $"{a.FirstName} {a.LastName}")),
                 GenreName = genreName,
                 Language = newBookTitle.Language,
                 Price = newBookTitle.Price ?? 0m,
                 PublicationDate = newBookTitle.PublicationDate,
                 PageCount = newBookTitle.PageCount,
-                PublisherName = publisherName
+                PublisherName = publisherName,
+                AuthorIds = authors.Select(a => a.AuthorId).ToArray()
 
             });
             RaisePropertyChanged(nameof(Books));
         }
 
-            private void EditNewBookTitle()
-            {
-                if (SelectedBook == null) return;
+        private void EditNewBookTitle()
+        {
+            if (SelectedBook == null)
+                return;
 
+            var vm = new AddNewTitleViewModel
+            {
+                Title = SelectedBook.Title,
+                ISBN = SelectedBook.Isbn13,
+                Language = SelectedBook.Language,
+                PriceText = SelectedBook.Price.ToString(),
+                PublicationDateText = SelectedBook.PublicationDate?.ToString("yyyy-MM-dd"),
+                PageCountText = SelectedBook.PageCount?.ToString(),
+
+                SelectedGenre = Genres.FirstOrDefault(g => g.GenreName == SelectedBook.GenreName),
+                SelectedPublisher = Publishers.FirstOrDefault(p => p.PublisherName == SelectedBook.PublisherName)
+            };
+
+            foreach(var author in vm.Authors)
+            {
+                if (SelectedBook.AuthorIds.Contains(author.AuthorId))
+                {
+                    author.IsSelected = true;
+                }
             }
 
-            public void DeleteBookFromInventory(BookAdminItem bookItem)
+            var dialog = new EditNewTitleDialog
             {
-                if (bookItem == null) return;
+                DataContext = vm
+            };
 
+            if (dialog.ShowDialog() != true)
+                return;
+
+
+            var dto = dialog.Book;
+            if (dto == null)
+                return;
+
+            var updatedBook = _selectionService.UpdateBook(
+                SelectedBook.Isbn13,
+                dto.Title,
+                dto.Language,
+                dto.Price,
+                dto.PublicationDate,
+                dto.PageCount,
+                dto.GenreId,
+                dto.PublisherId
+            );
+
+            //  Uppdatera UI
+            SelectedBook.Title = updatedBook.Title;
+            SelectedBook.Language = updatedBook.Language;
+            SelectedBook.Price = updatedBook.Price ?? 0m;
+            SelectedBook.PublicationDate = updatedBook.PublicationDate;
+            SelectedBook.PageCount = updatedBook.PageCount;
+            SelectedBook.GenreName = vm.SelectedGenre?.GenreName;
+            SelectedBook.PublisherName = vm.SelectedPublisher?.PublisherName;
+        }
+
+
+        public void DeleteBookFromInventory(BookAdminItem bookItem)
+        {
+            if (bookItem == null) return;
 
 
             var book = _context.Books
@@ -246,23 +315,47 @@ namespace BookStore_Presentation.ViewModels
             }
         }
 
-            private void OpenAddNewAuthorDialog()
+        private void OpenAddNewAuthorDialog()
+        {
+            var dialog = new AddNewAuthorDialog
             {
-                var dialog = new AddNewAuthorDialog
-                {
-                    Owner = Application.Current.MainWindow
-                };
+                Owner = Application.Current.MainWindow
+            };
 
-                if (dialog.ShowDialog() != true)
-                    return;
+            if (dialog.ShowDialog() != true)
+                return;
 
-                var dto = dialog.Author;
-                if (dto == null) return;
+            var dto = dialog.Author;
+            if (dto == null) return;
 
-                var newAuthor = _authorService.CreateAuthor(dto.FirstName, dto.LastName, dto.BirthDay);
-            }
+            var newAuthor = _authorService.CreateAuthor(dto.FirstName, dto.LastName, dto.BirthDay);
         }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
