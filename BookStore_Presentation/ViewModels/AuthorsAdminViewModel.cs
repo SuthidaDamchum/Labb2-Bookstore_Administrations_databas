@@ -96,7 +96,6 @@ namespace BookStore_Presentation.ViewModels
             });
         }
 
-
         private void EditAuthor()
         {
 
@@ -128,18 +127,16 @@ namespace BookStore_Presentation.ViewModels
                  dto.LastName,
                  dto.BirthDay
             );
-            _context.SaveChanges();
 
             SelectedAuthor.FullName = updateAuthor.FirstName + " " + updateAuthor.LastName;
             SelectedAuthor.BirthDay = updateAuthor.BirthDay;
 
         }
 
+
         private void DeleteAuthor()
         {
             if (SelectedAuthor == null) return;
-
-
 
             var result = MessageBox.Show(
                 $"Are you sure you want to delete {SelectedAuthor.FullName}?",

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BookStore_Presentation.Models
 {
-    internal class CreateNewTitleDto
+    public class CreateNewTitleDto
     {
         public string Isbn13 { get; set; } = null!;
         public string Title { get; set; } = null!;

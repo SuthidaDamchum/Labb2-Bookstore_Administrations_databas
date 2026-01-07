@@ -54,7 +54,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Toolbar -->
+      
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0 0 0 10" HorizontalAlignment="Left">
             <Button Command="{Binding AddAuthorCommand}" Width="120" Style="{StaticResource ToolbarButtonStyle}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

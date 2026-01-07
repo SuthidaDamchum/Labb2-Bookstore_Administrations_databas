@@ -11,15 +11,16 @@ namespace BookStore_Presentation
         {
             base.OnStartup(e);
 
-            var bookSelectionService = new BookSelectionService();
-            var authorService = new AuthorService(new BookStoreContext());
+            //var context = new BookStoreContext(); 
+            //var bookSelectionService = new BookSelectionService(context); // Pass context
+            //var authorService = new AuthorService(context);
 
-            var mainWindowViewModel = new MainWindowViewModel(bookSelectionService, authorService);
+            //var mainWindowViewModel = new MainWindowViewModel(bookSelectionService, authorService);
 
-            var mainWindow = new MainWindow
-            {
-                DataContext = mainWindowViewModel
-            };
+            //var mainWindow = new MainWindow
+            //{
+            //    DataContext = mainWindowViewModel
+            //};
 
             //mainWindow.Show();
         }

@@ -227,42 +227,20 @@ namespace BookStore_Presentation.ViewModels
 
         private void EditNewBookTitle()
         {
-            if (SelectedBook == null)
-                return;
+            if (SelectedBook == null) return;
 
-            var vm = new AddNewTitleViewModel
-            {
-                Title = SelectedBook.Title,
-                ISBN = SelectedBook.Isbn13,
-                Language = SelectedBook.Language,
-                PriceText = SelectedBook.Price.ToString(),
-                PublicationDateText = SelectedBook.PublicationDate?.ToString("yyyy-MM-dd"),
-                PageCountText = SelectedBook.PageCount?.ToString(),
-
-                SelectedGenre = Genres.FirstOrDefault(g => g.GenreName == SelectedBook.GenreName),
-                SelectedPublisher = Publishers.FirstOrDefault(p => p.PublisherName == SelectedBook.PublisherName)
-            };
-
-            foreach(var author in vm.Authors)
-            {
-                if (SelectedBook.AuthorIds.Contains(author.AuthorId))
-                {
-                    author.IsSelected = true;
-                }
-            }
+            var vm = new AddNewTitleViewModel();
+            vm.LoadFromBook(SelectedBook); // <-- fyller dialogen med korrekt data
 
             var dialog = new EditNewTitleDialog
             {
                 DataContext = vm
             };
 
-            if (dialog.ShowDialog() != true)
-                return;
-
+            if (dialog.ShowDialog() != true) return;
 
             var dto = dialog.Book;
-            if (dto == null)
-                return;
+            if (dto == null) return;
 
             var updatedBook = _selectionService.UpdateBook(
                 SelectedBook.Isbn13,
@@ -275,7 +253,7 @@ namespace BookStore_Presentation.ViewModels
                 dto.PublisherId
             );
 
-            //  Uppdatera UI
+            // Uppdatera UI
             SelectedBook.Title = updatedBook.Title;
             SelectedBook.Language = updatedBook.Language;
             SelectedBook.Price = updatedBook.Price ?? 0m;
@@ -284,6 +262,66 @@ namespace BookStore_Presentation.ViewModels
             SelectedBook.GenreName = vm.SelectedGenre?.GenreName;
             SelectedBook.PublisherName = vm.SelectedPublisher?.PublisherName;
         }
+
+    
+
+        //if (SelectedBook == null)
+        //    return;
+
+        //var vm = new AddNewTitleViewModel
+        //{
+        //    Title = SelectedBook.Title,
+        //    ISBN = SelectedBook.Isbn13,
+        //    Language = SelectedBook.Language,
+        //    PriceText = SelectedBook.Price.ToString(),
+        //    PublicationDateText = SelectedBook.PublicationDate?.ToString("yyyy-MM-dd"),
+        //    PageCountText = SelectedBook.PageCount?.ToString(),
+
+        //    SelectedGenre = Genres.FirstOrDefault(g => g.GenreName == SelectedBook.GenreName),
+        //    SelectedPublisher = Publishers.FirstOrDefault(p => p.PublisherName == SelectedBook.PublisherName)
+        //};
+
+        //foreach(var author in vm.Authors)
+        //{
+        //    if (SelectedBook.AuthorIds.Contains(author.AuthorId))
+        //    {
+        //        author.IsSelected = true;
+        //    }
+        //}
+
+        //var dialog = new EditNewTitleDialog
+        //{
+        //    DataContext = vm
+        //};
+
+        //if (dialog.ShowDialog() != true)
+        //    return;
+
+
+        //var dto = dialog.Book;
+        //if (dto == null)
+        //    return;
+
+        //var updatedBook = _selectionService.UpdateBook(
+        //    SelectedBook.Isbn13,
+        //    dto.Title,
+        //    dto.Language,
+        //    dto.Price,
+        //    dto.PublicationDate,
+        //    dto.PageCount,
+        //    dto.GenreId,
+        //    dto.PublisherId
+        //);
+
+        ////  Uppdatera UI
+        //SelectedBook.Title = updatedBook.Title;
+        //SelectedBook.Language = updatedBook.Language;
+        //SelectedBook.Price = updatedBook.Price ?? 0m;
+        //SelectedBook.PublicationDate = updatedBook.PublicationDate;
+        //SelectedBook.PageCount = updatedBook.PageCount;
+        //SelectedBook.GenreName = vm.SelectedGenre?.GenreName;
+        //SelectedBook.PublisherName = vm.SelectedPublisher?.PublisherName;
+
 
 
         public void DeleteBookFromInventory(BookAdminItem bookItem)

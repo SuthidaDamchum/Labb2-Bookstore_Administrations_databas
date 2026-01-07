@@ -15,7 +15,7 @@ namespace BookStore_Presentation
         {
             InitializeComponent();
             var context = new BookStoreContext();
-            var bookSelectionService = new BookSelectionService();
+            var bookSelectionService = new BookSelectionService(context);
             var authorService = new AuthorService(context);
 
             // Pass them to MainWindowViewModel

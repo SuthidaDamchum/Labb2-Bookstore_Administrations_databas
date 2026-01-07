@@ -11,7 +11,6 @@
              d:DataContext="{d:DesignInstance Type=viewmodels:BooksAdminViewModel, IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
-        <!-- Toolbar button style (gray) -->
         <Style x:Key="ToolbarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="0,0,5,0"/>
             <Setter Property="Padding" Value="6,4"/>
@@ -23,18 +22,27 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="4">
+                        <Border x:Name="border" 
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <!-- Mouse over -->
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#777"/>
+                                <Setter TargetName="border" Property="Background" Value="#777"/>
                             </Trigger>
+                            <!-- Pressed -->
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#555"/>
+                                <Setter TargetName="border" Property="Background" Value="#555"/>
+                            </Trigger>
+                            <!-- Disabled -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#aaa"/>
+                                <Setter Property="Foreground" Value="#666"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -58,7 +66,9 @@
                 </StackPanel>
             </Button>
 
-            <Button Command="" Width="120" Style="{StaticResource ToolbarButtonStyle}">
+            <Button Command="{Binding EditNewBookTitleCommand}" 
+                    CommandParameter="{Binding SelectedBook}"
+                    Width="120" Style="{StaticResource ToolbarButtonStyle}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="✏" Margin="0,0,5,0"/>
                     <TextBlock Text="Edit Book"/>
@@ -90,13 +100,13 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ISBN-13" Binding="{Binding Isbn13}" Width="Auto"/>
                 <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="Auto"/>
-                <DataGridTextColumn Header="Author" Binding="{Binding AuthorNames}" Width="Auto"/>
+                <DataGridTextColumn Header="Author" Binding="{Binding AuthorNameString}" Width="Auto"/>
                 <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" Width="Auto"/>
                 <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="Auto"/>
                 <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat=F2}" Width="Auto"/>
                 <DataGridTextColumn Header="Published" Binding="{Binding PublicationDate}" Width="Auto"/>
                 <DataGridTextColumn Header="Pages" Binding="{Binding PageCount}" Width="Auto"/>
-                <DataGridTextColumn Header="Publisher" Binding="{Binding Publisher}" Width="Auto"/>
+                <DataGridTextColumn Header="Publisher" Binding="{Binding PublisherName}" Width="Auto"/>
 
             </DataGrid.Columns>
         </DataGrid>
