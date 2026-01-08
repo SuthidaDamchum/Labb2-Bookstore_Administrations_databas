@@ -49,35 +49,13 @@ namespace BookStore_Presentation.ViewModels
 
             LanguageOptions = new List<string> { "English", "Swedish", "Norwegian", "French", "Spanish", "Danish", "German" };
 
-
-
-             
+            // Commands
             SaveCommand = new DelegateCommand(Save);
             EditCommand = new DelegateCommand(Edit);
             CancelCommand = new DelegateCommand(Cancel);
         }
 
-    
-         public void LoadFromBook(BookAdminItem book)
-    {
-        if (book == null) return;
-
-        Title = book.Title;
-        ISBN = book.Isbn13;
-        Language = book.Language;
-        PriceText = book.Price.ToString("0.##", CultureInfo.InvariantCulture);
-        PublicationDateText = book.PublicationDate?.ToString("yyyy-MM-dd");
-        PageCountText = book.PageCount?.ToString();
-
-        SelectedGenre = Genres.FirstOrDefault(g => g.GenreName == book.GenreName);
-        SelectedPublisher = Publishers.FirstOrDefault(p => p.PublisherName == book.PublisherName);
-
-        // Mark selected authors
-        foreach (var author in Authors)
-        {
-            author.IsSelected = book.AuthorIds.Contains(author.AuthorId);
-        }
-    }
+        #region Properties
 
         private string _title = "";
         private string _isbn = "";
@@ -192,6 +170,9 @@ namespace BookStore_Presentation.ViewModels
         public ICommand EditCommand { get; }
         public ICommand CancelCommand { get; }
 
+        #endregion
+
+        #region Methods
 
         private void Save(object? parameter)
         {
@@ -248,122 +229,6 @@ namespace BookStore_Presentation.ViewModels
             if (parameter is Window window) window.DialogResult = true;
         }
 
-        private void Edit(object? parameter)
-        {
-            if (!ValidateInput())
-                return;
-
-            if (!decimal.TryParse(PriceText, NumberStyles.Currency, CultureInfo.InvariantCulture, out var price))
-            {
-                MessageBox.Show("Invalid price.", "Validation Error");
-                return;
-            }
-
-            DateOnly? publicationDate = null;
-            if (!string.IsNullOrWhiteSpace(PublicationDateText))
-            {
-                if (!DateOnly.TryParseExact(
-                    PublicationDateText,
-                    "yyyy-MM-dd",
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var date))
-                {
-                    MessageBox.Show("Invalid publication date. Use YYYY-MM-DD.");
-                    return;
-                }
-
-                publicationDate = date;
-            }
-
-            int? pageCount = null;
-            if (int.TryParse(PageCountText, out var pages))
-                pageCount = pages;
-
-            var book = _context.Books
-                .Include(b => b.BookAuthors)
-                .FirstOrDefault(b => b.Isbn13 == ISBN);
-
-            if (book == null)
-            {
-                MessageBox.Show("Book not found.");
-                return;
-            }
-
-            book.Title = Title;
-            book.Language = Language;
-            book.Price = price;
-            book.GenreId = SelectedGenre?.GenreId;
-            book.PublisherId = SelectedPublisher?.PublisherId;
-            book.PublicationDate = publicationDate;
-            book.PageCount = pageCount;
-
-            // --- Sync authors correctly ---
-            var selectedAuthorIds = SelectedAuthors.Select(a => a.AuthorId).ToList();
-
-            // Remove authors not in the selection
-            var authorsToRemove = book.BookAuthors.Where(ba => !selectedAuthorIds.Contains(ba.AuthorId)).ToList();
-            foreach (var author in authorsToRemove)
-            {
-                book.BookAuthors.Remove(author);
-            }
-
-    
-            foreach (var authorId in selectedAuthorIds)
-            {
-                if (!book.BookAuthors.Any(ba => ba.AuthorId == authorId))
-                {
-                    book.BookAuthors.Add(new BookAuthor
-                    {
-                        AuthorId = authorId,
-                        BookIsbn13 = book.Isbn13,
-                        Role = "Main Author"
-                    });
-                }
-            }
-
-            _context.SaveChanges();
-
-            if (parameter is Window window)
-                window.DialogResult = true;
-        }
-
-        private bool ValidateInput()
-        {
-            if (string.IsNullOrWhiteSpace(Language))
-            {
-                MessageBox.Show("Language is required", "Validation Error");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(Title))
-            {
-                MessageBox.Show("Title is required.", "Validation Error");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(ISBN))
-            {
-                MessageBox.Show("ISBN is required.", "Validation Error");
-                return false;
-            }
-      
-            if (ISBN.Length != 13 || !ISBN.All(char.IsDigit))
-            {
-                MessageBox.Show("ISBN-13 must be exacly 13 digits", "Validation Error");
-                return false;
-            }
-
-
-            if (SelectedAuthors.Count == 0)
-            {
-                MessageBox.Show("Please select at least one author.", "Validation Error");
-                return false;
-            }
-
-            return true; 
-        }
-
         private void Cancel(object? parameter)
         {
             if (parameter is Window window) window.DialogResult = false;
@@ -378,7 +243,7 @@ namespace BookStore_Presentation.ViewModels
             }
         }
 
-
+        #endregion
     }
 }
 
