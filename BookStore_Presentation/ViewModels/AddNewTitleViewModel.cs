@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -27,16 +28,30 @@ namespace BookStore_Presentation.ViewModels
             Genres = _context.Genres.ToList();
             Publishers = _context.Publishers.ToList();
             Authors = new ObservableCollection<AuthorItem>(
-                _context.Authors.Select(a => new AuthorItem
-                {
-                    AuthorId = a.AuthorId,
-                    FullName = $"{a.FirstName} {a.LastName}"
-                })
+                _context.Authors
+                    .Where(a => !string.IsNullOrWhiteSpace(a.FirstName) && !string.IsNullOrWhiteSpace(a.LastName))
+                    .Select(a => new AuthorItem
+                    {
+                        AuthorId = a.AuthorId,
+                        FullName = $"{a.FirstName} {a.LastName}",
+                        BirthDay = a.BirthDay
+                    })
             );
+
+
+
+
+            foreach (var author in Authors)
+            {
+                author.PropertyChanged += OnAuthorSelectionChanged;
+            }
+
 
             LanguageOptions = new List<string> { "English", "Swedish", "Norwegian", "French", "Spanish", "Danish", "German" };
 
 
+
+             
             SaveCommand = new DelegateCommand(Save);
             EditCommand = new DelegateCommand(Edit);
             CancelCommand = new DelegateCommand(Cancel);
@@ -50,7 +65,7 @@ namespace BookStore_Presentation.ViewModels
         Title = book.Title;
         ISBN = book.Isbn13;
         Language = book.Language;
-        PriceText = book.Price.ToString();
+        PriceText = book.Price.ToString("0.##", CultureInfo.InvariantCulture);
         PublicationDateText = book.PublicationDate?.ToString("yyyy-MM-dd");
         PageCountText = book.PageCount?.ToString();
 
@@ -63,8 +78,6 @@ namespace BookStore_Presentation.ViewModels
             author.IsSelected = book.AuthorIds.Contains(author.AuthorId);
         }
     }
-
-
 
         private string _title = "";
         private string _isbn = "";
@@ -104,7 +117,11 @@ namespace BookStore_Presentation.ViewModels
         {
             get
             {
-                if (decimal.TryParse(_priceText, NumberStyles.Currency, CultureInfo.InvariantCulture, out var result))
+                if (decimal.TryParse
+                    (_priceText, 
+                    NumberStyles.Number,
+                    CultureInfo.InvariantCulture, 
+                    out var result))
                     return result;
                 return null;
             }
@@ -153,6 +170,7 @@ namespace BookStore_Presentation.ViewModels
             get => _selectedPublisher;
             set { _selectedPublisher = value; RaisePropertyChanged(); }
         }
+
 
         public List<string> LanguageOptions { get; set; }
         public List<Genre> Genres { get; set; }
@@ -232,103 +250,135 @@ namespace BookStore_Presentation.ViewModels
 
         private void Edit(object? parameter)
         {
-            ValidateInput();
+            if (!ValidateInput())
+                return;
 
             if (!decimal.TryParse(PriceText, NumberStyles.Currency, CultureInfo.InvariantCulture, out var price))
             {
-                MessageBox.Show("Invalid price.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Invalid price.", "Validation Error");
                 return;
             }
 
             DateOnly? publicationDate = null;
             if (!string.IsNullOrWhiteSpace(PublicationDateText))
             {
-                if (DateOnly.TryParseExact(PublicationDateText, "yyyy-MM-dd", CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None, out var date))
-                    publicationDate = date;
-                else
+                if (!DateOnly.TryParseExact(
+                    PublicationDateText,
+                    "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var date))
                 {
-                    MessageBox.Show("Invalid publication date. Use YYYY-MM-DD.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Invalid publication date. Use YYYY-MM-DD.");
                     return;
                 }
+
+                publicationDate = date;
             }
 
             int? pageCount = null;
-            if (!string.IsNullOrWhiteSpace(PageCountText) && int.TryParse(PageCountText, out var pages))
+            if (int.TryParse(PageCountText, out var pages))
                 pageCount = pages;
 
+            var book = _context.Books
+                .Include(b => b.BookAuthors)
+                .FirstOrDefault(b => b.Isbn13 == ISBN);
 
-            var bookToBeEdited = _context.Books.Where(b => b.Isbn13 == ISBN).Include(b => b.BookAuthors).FirstOrDefault();
-
-            if (bookToBeEdited == null)
+            if (book == null)
             {
-                MessageBox.Show("selected book doesn't exist in the database", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Book not found.");
                 return;
             }
-            var authorIds = bookToBeEdited.BookAuthors.Select(x => x.AuthorId);
 
-            bookToBeEdited.Title = Title;
-            bookToBeEdited.Isbn13 = ISBN;
-            bookToBeEdited.Language = Language;
-            bookToBeEdited.Price = price;
-            bookToBeEdited.GenreId = SelectedGenre?.GenreId;
-            bookToBeEdited.PublisherId = SelectedPublisher?.PublisherId;
-            bookToBeEdited.PublicationDate = publicationDate;
-            bookToBeEdited.PageCount = pageCount;
-            bookToBeEdited.BookAuthors = SelectedAuthors.Where(sa => !authorIds.Contains(sa.AuthorId)).Select(a => new BookAuthor
+            book.Title = Title;
+            book.Language = Language;
+            book.Price = price;
+            book.GenreId = SelectedGenre?.GenreId;
+            book.PublisherId = SelectedPublisher?.PublisherId;
+            book.PublicationDate = publicationDate;
+            book.PageCount = pageCount;
+
+            // --- Sync authors correctly ---
+            var selectedAuthorIds = SelectedAuthors.Select(a => a.AuthorId).ToList();
+
+            // Remove authors not in the selection
+            var authorsToRemove = book.BookAuthors.Where(ba => !selectedAuthorIds.Contains(ba.AuthorId)).ToList();
+            foreach (var author in authorsToRemove)
             {
-                AuthorId = a.AuthorId,
-                BookIsbn13 = ISBN,
-                Role = "Main Author"
-            }).ToList();
+                book.BookAuthors.Remove(author);
+            }
+
+    
+            foreach (var authorId in selectedAuthorIds)
+            {
+                if (!book.BookAuthors.Any(ba => ba.AuthorId == authorId))
+                {
+                    book.BookAuthors.Add(new BookAuthor
+                    {
+                        AuthorId = authorId,
+                        BookIsbn13 = book.Isbn13,
+                        Role = "Main Author"
+                    });
+                }
+            }
 
             _context.SaveChanges();
 
-            MessageBox.Show("Book saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-
-            if (parameter is Window window) window.DialogResult = true;
+            if (parameter is Window window)
+                window.DialogResult = true;
         }
 
-        private void ValidateInput()
+        private bool ValidateInput()
         {
             if (string.IsNullOrWhiteSpace(Language))
             {
-                MessageBox.Show("Language is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                MessageBox.Show("Language is required", "Validation Error");
+                return false;
             }
 
             if (string.IsNullOrWhiteSpace(Title))
             {
-                MessageBox.Show("Title is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                MessageBox.Show("Title is required.", "Validation Error");
+                return false;
             }
 
             if (string.IsNullOrWhiteSpace(ISBN))
             {
-                MessageBox.Show("ISBN is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                MessageBox.Show("ISBN is required.", "Validation Error");
+                return false;
             }
+      
+            if (ISBN.Length != 13 || !ISBN.All(char.IsDigit))
+            {
+                MessageBox.Show("ISBN-13 must be exacly 13 digits", "Validation Error");
+                return false;
+            }
+
 
             if (SelectedAuthors.Count == 0)
             {
-                MessageBox.Show("Please select at least one author.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-
+                MessageBox.Show("Please select at least one author.", "Validation Error");
+                return false;
             }
-            if (SelectedAuthors.Count > 2)
-                {
-                    MessageBox.Show("You have selected more than two authors, Only the first two will be saved", "Validation Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
 
-            }
-           
-        
+            return true; 
+        }
 
         private void Cancel(object? parameter)
         {
             if (parameter is Window window) window.DialogResult = false;
         }
 
-  
+        private void OnAuthorSelectionChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(AuthorItem.IsSelected))
+            {
+                RaisePropertyChanged(nameof(SelectedAuthors));
+                RaisePropertyChanged(nameof(SelectedAuthorsText));
+            }
+        }
+
+
     }
 }
+

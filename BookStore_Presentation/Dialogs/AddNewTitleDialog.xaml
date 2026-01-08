@@ -28,15 +28,11 @@
             <TextBox Text="{Binding ISBN, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
 
             <TextBlock Text="Authors:" Margin="0,10,0,0"/>
+            <TextBlock Text="{Binding SelectedAuthorsText}" Margin="0,0,0,10"/>
             <ComboBox x:Name="AuthorsComboBox"
           ItemsSource="{Binding Authors}"
-          IsEditable="True"
-          IsReadOnly="True"
-          StaysOpenOnEdit="True"
-          HorizontalAlignment="Left"
-          Width="280"
-          MaxDropDownHeight="200"
-          Text="{Binding SelectedAuthorsText, Mode=OneWay}">
+          IsEditable="False"
+          MaxDropDownHeight="200">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <CheckBox Content="{Binding FullName}"
