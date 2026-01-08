@@ -2,6 +2,7 @@
 using BookStore_Infrastrcuture.Data.Model;
 using BookStore_Presentation.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace BookStore_Presentation.Services
 {
@@ -12,31 +13,35 @@ namespace BookStore_Presentation.Services
 
         private readonly BookStoreContext _context;
 
-        public BookSelectionService(BookStoreContext context)
-        {
-            _context = context;
+
+            public BookSelectionService(BookStoreContext context)
+            {
+                _context = context;
+            }
+                        public Book? UpdateBook(
+                       string isbn13,
+                       string title,
+                       string? language,
+                       decimal? price,
+                       DateOnly? publicationDate,
+                       int? pagecount,
+                       int? genreID,
+                       int? publisherId
+                        )
+                {
+
+        
+                    var book = _context.Books
+                        .Include(b => b.Genre)
+                        .Include(b => b.Publisher)
+                        .Include(b => b.BookAuthors)
+                               .ThenInclude(ba => ba.Author)
+                               .FirstOrDefault(b => b.Isbn13 == isbn13);
+
+      
+                    _context.SaveChanges();
+                    return book;
+                }
+            }
         }
-        public Book UpdateBook(
-            string isbn13, string title, string? language, decimal? price, DateOnly? publicationDate, int? pagecount, int? genreID, int? publisherId)
-        {
-            var book = _context.Books.FirstOrDefault(b => b.Isbn13 == isbn13);
-
-            if (book == null)
-                throw new Exception("Book not found");
-
-
-            book.Title = title;
-            book.Language = language;
-            book.Price = price;
-            book.PublicationDate = publicationDate;
-            book.PageCount = pagecount;
-            book.GenreId = genreID;
-            book.PublisherId = publisherId;
-
-            _context.SaveChanges();
-            return book;
-
-        }
-    }
-}
 

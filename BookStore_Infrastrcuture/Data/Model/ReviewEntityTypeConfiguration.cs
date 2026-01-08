@@ -33,7 +33,7 @@ public class ReviewEntityTypeConfiguration : IEntityTypeConfiguration<Review>
 
             builder.HasOne(d => d.Isbn13Navigation).WithMany(p => p.Reviews)
                 .HasForeignKey(d => d.Isbn13)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__Review__isbn13__2FCF1A8A");
     }
 }

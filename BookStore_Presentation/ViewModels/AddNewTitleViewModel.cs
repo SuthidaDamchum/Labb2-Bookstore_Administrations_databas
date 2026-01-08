@@ -10,7 +10,6 @@ using BookStore_Domain;
 using BookStore_Infrastrcuture.Data.Model;
 using BookStore_Presentation.Command;
 using BookStore_Presentation.Models;
-using BookStore_Presentation.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore_Presentation.ViewModels
@@ -23,8 +22,7 @@ namespace BookStore_Presentation.ViewModels
         {
             _context = new BookStoreContext();
 
-            // Load data
-
+            // Load reference data
             Genres = _context.Genres.ToList();
             Publishers = _context.Publishers.ToList();
             Authors = new ObservableCollection<AuthorItem>(
@@ -38,14 +36,8 @@ namespace BookStore_Presentation.ViewModels
                     })
             );
 
-
-
-
             foreach (var author in Authors)
-            {
                 author.PropertyChanged += OnAuthorSelectionChanged;
-            }
-
 
             LanguageOptions = new List<string> { "English", "Swedish", "Norwegian", "French", "Spanish", "Danish", "German" };
 
@@ -55,130 +47,67 @@ namespace BookStore_Presentation.ViewModels
             CancelCommand = new DelegateCommand(Cancel);
         }
 
-        #region Properties
+            #region Properties
 
-        private string _title = "";
-        private string _isbn = "";
-        private string? _language;
-        private string? _priceText;
-        private string? _publicationDateText;
-        private string? _pageCountText;
+            public string Title { get; set; } = "";
+            public string ISBN { get; set; } = "";
+            public string? Language { get; set; }
+            public string? PriceText { get; set; }
+            public string? PublicationDateText { get; set; }
+            public string? PageCountText { get; set; }
 
-        private Genre? _selectedGenre;
-        private Publisher? _selectedPublisher;
+            public Genre? SelectedGenre { get; set; }
+            public Publisher? SelectedPublisher { get; set; }
 
-        public string Title
-        {
-            get => _title;
-            set { _title = value; RaisePropertyChanged(); }
-        }
+            public List<string> LanguageOptions { get; set; }
+            public List<Genre> Genres { get; set; }
+            public List<Publisher> Publishers { get; set; }
 
-        public string ISBN
-        {
-            get => _isbn;
-            set { _isbn = value; RaisePropertyChanged(); }
-        }
-
-        public string? Language
-        {
-            get => _language;
-            set { _language = value; RaisePropertyChanged(); }
-        }
-
-        public string? PriceText
-        {
-            get => _priceText;
-            set { _priceText = value; RaisePropertyChanged(); }
-        }
-
-        public decimal? Price
-        {
-            get
+            private ObservableCollection<AuthorItem> _authors = new();
+            public ObservableCollection<AuthorItem> Authors
             {
-                if (decimal.TryParse
-                    (_priceText, 
-                    NumberStyles.Number,
-                    CultureInfo.InvariantCulture, 
-                    out var result))
-                    return result;
-                return null;
+                get => _authors;
+                set { _authors = value; RaisePropertyChanged(); }
             }
-        }
 
-        public string? PublicationDateText
+            public List<AuthorItem> SelectedAuthors => Authors.Where(a => a.IsSelected).ToList();
+            public string SelectedAuthorsText => string.Join(", ", SelectedAuthors.Select(a => a.FullName));
+
+            public ICommand SaveCommand { get; }
+            public ICommand EditCommand { get; }
+            public ICommand CancelCommand { get; }
+
+            #endregion
+
+            #region Methods
+
+            /// <summary>
+            /// Load data from existing book (for edit)
+            /// </summary>
+        public void LoadFromBook(BookAdminItem book)
         {
-            get => _publicationDateText;
-            set { _publicationDateText = value; RaisePropertyChanged(); }
+            if (book == null) return;
+
+            Title = book.Title;
+            ISBN = book.Isbn13;
+            Language = book.Language;
+            PriceText = book.Price.ToString("0.##", CultureInfo.InvariantCulture);
+            PublicationDateText = book.PublicationDate?.ToString("yyyy-MM-dd");
+            PageCountText = book.PageCount?.ToString();
+
+            SelectedGenre = Genres.FirstOrDefault(g => g.GenreName == book.GenreName);
+            SelectedPublisher = Publishers.FirstOrDefault(p => p.PublisherName == book.PublisherName);
+
+            // Mark authors as selected
+            foreach (var author in Authors)
+                author.IsSelected = book.AuthorIds.Contains(author.AuthorId);
         }
-
-        public DateOnly? PublicationDate
-        {
-            get
-            {
-                if (DateOnly.TryParse(_publicationDateText, out var date))
-                    return date;
-                return null;
-            }
-        }
-
-        public string? PageCountText
-        {
-            get => _pageCountText;
-            set { _pageCountText = value; RaisePropertyChanged(); }
-        }
-
-        public int? PageCount
-        {
-            get
-            {
-                if (int.TryParse(_pageCountText, out var result))
-                    return result;
-                return null;
-            }
-        }
-
-        public Genre? SelectedGenre
-        {
-            get => _selectedGenre;
-            set { _selectedGenre = value; RaisePropertyChanged(); }
-        }
-
-        public Publisher? SelectedPublisher
-        {
-            get => _selectedPublisher;
-            set { _selectedPublisher = value; RaisePropertyChanged(); }
-        }
-
-
-        public List<string> LanguageOptions { get; set; }
-        public List<Genre> Genres { get; set; }
-        public List<Publisher> Publishers { get; set; }
-
-        private ObservableCollection<AuthorItem> _authors = new();
-        public ObservableCollection<AuthorItem> Authors
-        {
-            get => _authors;
-            set { _authors = value; RaisePropertyChanged(); }
-        }
-
-        public List<AuthorItem> SelectedAuthors => Authors.Where(a => a.IsSelected).ToList();
-        public string SelectedAuthorsText => string.Join(", ", SelectedAuthors.Select(a => a.FullName));
-
-
-
-        public ICommand SaveCommand { get; }
-        public ICommand EditCommand { get; }
-        public ICommand CancelCommand { get; }
-
-        #endregion
-
-        #region Methods
 
         private void Save(object? parameter)
         {
-            ValidateInput();
+            if (!ValidateInput()) return;
 
-            if (!decimal.TryParse(PriceText, NumberStyles.Currency, CultureInfo.InvariantCulture, out var price))
+            if (!decimal.TryParse(PriceText, NumberStyles.Number, CultureInfo.InvariantCulture, out var price))
             {
                 MessageBox.Show("Invalid price.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -187,9 +116,8 @@ namespace BookStore_Presentation.ViewModels
             DateOnly? publicationDate = null;
             if (!string.IsNullOrWhiteSpace(PublicationDateText))
             {
-                if (DateOnly.TryParseExact(PublicationDateText, "yyyy-MM-dd", CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None, out var date))
-                    publicationDate = date;
+                if (DateOnly.TryParseExact(PublicationDateText, "yyyy-MM-dd", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var d))
+                    publicationDate = d;
                 else
                 {
                     MessageBox.Show("Invalid publication date. Use YYYY-MM-DD.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -197,11 +125,8 @@ namespace BookStore_Presentation.ViewModels
                 }
             }
 
-            int? pageCount = null;
-            if (!string.IsNullOrWhiteSpace(PageCountText) && int.TryParse(PageCountText, out var pages))
-                pageCount = pages;
+            int? pageCount = int.TryParse(PageCountText, out var p) ? p : null;
 
-            // Create Book
             var newBook = new Book
             {
                 Title = Title,
@@ -225,25 +150,96 @@ namespace BookStore_Presentation.ViewModels
 
             MessageBox.Show("Book saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-         
-            if (parameter is Window window) window.DialogResult = true;
+            if (parameter is Window window)
+                window.DialogResult = true;
         }
 
-        private void Cancel(object? parameter)
+        private void Edit(object? parameter)
         {
-            if (parameter is Window window) window.DialogResult = false;
-        }
+            if (!ValidateInput()) return;
 
-        private void OnAuthorSelectionChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(AuthorItem.IsSelected))
+            var book = _context.Books.Include(b => b.BookAuthors).FirstOrDefault(b => b.Isbn13 == ISBN);
+            if (book == null)
             {
-                RaisePropertyChanged(nameof(SelectedAuthors));
-                RaisePropertyChanged(nameof(SelectedAuthorsText));
+                MessageBox.Show("Book not found.");
+                return;
             }
+
+            if (!decimal.TryParse(PriceText, NumberStyles.Number, CultureInfo.InvariantCulture, out var price))
+            {
+                MessageBox.Show("Invalid price.");
+                return;
+            }
+
+            DateOnly? publicationDate = null;
+            if (!string.IsNullOrWhiteSpace(PublicationDateText))
+            {
+                if (DateOnly.TryParseExact(PublicationDateText, "yyyy-MM-dd", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var d))
+                    publicationDate = d;
+                else
+                    publicationDate = null;
+            }
+
+            int? pageCount = int.TryParse(PageCountText, out var p) ? p : null;
+
+            book.Title = Title;
+            book.Language = Language;
+            book.Price = price;
+            book.GenreId = SelectedGenre?.GenreId;
+            book.PublisherId = SelectedPublisher?.PublisherId;
+            book.PublicationDate = publicationDate;
+            book.PageCount = pageCount;
+
+            // Sync authors
+            var selectedIds = SelectedAuthors.Select(a => a.AuthorId).ToList();
+            var toRemove = book.BookAuthors.Where(ba => !selectedIds.Contains(ba.AuthorId)).ToList();
+            foreach (var ba in toRemove) book.BookAuthors.Remove(ba);
+            foreach (var id in selectedIds.Where(i => !book.BookAuthors.Any(ba => ba.AuthorId == i)))
+                book.BookAuthors.Add(new BookAuthor { AuthorId = id, BookIsbn13 = book.Isbn13, Role = "Main Author" });
+
+            _context.SaveChanges();
+
+            if (parameter is Window window)
+                window.DialogResult = true;
+        }
+
+                private void Cancel(object? parameter)
+                {
+                    if (parameter is Window window)
+                        window.DialogResult = false;
+                }
+
+                private void OnAuthorSelectionChanged(object? sender, PropertyChangedEventArgs e)
+                {
+                    if (e.PropertyName == nameof(AuthorItem.IsSelected))
+                        RaisePropertyChanged(nameof(SelectedAuthorsText));
+                }
+
+                private bool ValidateInput()
+        {
+            if (string.IsNullOrWhiteSpace(Title))
+            {
+                MessageBox.Show("Title is required.");
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(ISBN) || ISBN.Length != 13 || !ISBN.All(char.IsDigit))
+            {
+                MessageBox.Show("ISBN-13 must be exactly 13 digits.");
+                return false;
+            }
+            if (SelectedAuthors.Count == 0)
+            {
+                MessageBox.Show("Select at least one author.");
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(Language))
+            {
+                MessageBox.Show("Language is required.");
+                return false;
+            }
+            return true;
         }
 
         #endregion
     }
 }
-

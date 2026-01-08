@@ -27,7 +27,7 @@ public class BookAuthorEntityTypeConfiguration : IEntityTypeConfiguration<BookAu
 
             builder.HasOne(d => d.Author).WithMany(p => p.BookAuthors)
                 .HasForeignKey(d => d.AuthorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict) 
                 .HasConstraintName("FK_BookAuthor_Authors");
 
             builder.HasOne(d => d.Book).WithMany(p => p.BookAuthors)

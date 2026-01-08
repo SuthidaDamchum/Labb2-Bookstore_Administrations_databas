@@ -33,8 +33,6 @@ namespace BookStore_Presentation.ViewModels
                 get => _birthDayText;
                 set { _birthDayText = value; RaisePropertyChanged(); }
             }
-
-            // Convert string to DateOnly
             public DateOnly? BirthDay
             {
                 get
@@ -44,6 +42,8 @@ namespace BookStore_Presentation.ViewModels
                     return null;
                 }
             }
+
+
 
 
             

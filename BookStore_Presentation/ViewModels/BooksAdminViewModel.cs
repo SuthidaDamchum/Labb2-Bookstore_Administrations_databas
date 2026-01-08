@@ -74,7 +74,7 @@ namespace BookStore_Presentation.ViewModels
 
                             ReloadBooks();
                         }
-                    }
+                    }   
                 },
                   param => param is BookAdminItem 
           );
@@ -107,7 +107,8 @@ namespace BookStore_Presentation.ViewModels
         private void ReloadBooks()
         {
             Books.Clear();
-            foreach (var book in LoadBooks())
+            foreach (var book 
+                in LoadBooks())
             {
                 Books.Add(book);
             }
@@ -225,130 +226,92 @@ namespace BookStore_Presentation.ViewModels
             RaisePropertyChanged(nameof(Books));
         }
 
-        private void EditNewBookTitle()
-        {
-            if (SelectedBook == null) return;
-
-            var vm = new AddNewTitleViewModel();
-            vm.LoadFromBook(SelectedBook); // <-- fyller dialogen med korrekt data
-
-            var dialog = new EditNewTitleDialog
+                    private void EditNewBookTitle()
             {
-                DataContext = vm
-            };
+                if (SelectedBook == null)
+                    return;
 
-            if (dialog.ShowDialog() != true) return;
+                var viewModel = new AddNewTitleViewModel();
+                viewModel.LoadFromBook(SelectedBook);
 
-            var dto = dialog.Book;
-            if (dto == null) return;
+                var dialog = new EditNewTitleDialog
+                {
+                    DataContext = viewModel,
+                    Owner = Application.Current.MainWindow
+                };
 
-            var updatedBook = _selectionService.UpdateBook(
-                SelectedBook.Isbn13,
-                dto.Title,
-                dto.Language,
-                dto.Price,
-                dto.PublicationDate,
-                dto.PageCount,
-                dto.GenreId,
-                dto.PublisherId
-            );
+                if (dialog.ShowDialog() != true)
+                    return;
 
-            // Uppdatera UI
-            SelectedBook.Title = updatedBook.Title;
-            SelectedBook.Language = updatedBook.Language;
-            SelectedBook.Price = updatedBook.Price ?? 0m;
-            SelectedBook.PublicationDate = updatedBook.PublicationDate;
-            SelectedBook.PageCount = updatedBook.PageCount;
-            SelectedBook.GenreName = vm.SelectedGenre?.GenreName;
-            SelectedBook.PublisherName = vm.SelectedPublisher?.PublisherName;
-        }
+       
+                using var context = new BookStoreContext();
 
-    
+                var updatedBook = context.Books
+                    .AsNoTracking()
+                    .Include(b => b.BookAuthors)
+                        .ThenInclude(ba => ba.Author)
+                    .Include(b => b.Genre)
+                    .Include(b => b.Publisher)
+                    .FirstOrDefault(b => b.Isbn13 == SelectedBook.Isbn13);
 
-        //if (SelectedBook == null)
-        //    return;
+                if (updatedBook == null)
+                {
+                    MessageBox.Show("Could not reload updated book.", "Error",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
-        //var vm = new AddNewTitleViewModel
-        //{
-        //    Title = SelectedBook.Title,
-        //    ISBN = SelectedBook.Isbn13,
-        //    Language = SelectedBook.Language,
-        //    PriceText = SelectedBook.Price.ToString(),
-        //    PublicationDateText = SelectedBook.PublicationDate?.ToString("yyyy-MM-dd"),
-        //    PageCountText = SelectedBook.PageCount?.ToString(),
+        
+                SelectedBook.Title = updatedBook.Title;
+                SelectedBook.Language = updatedBook.Language;
+                SelectedBook.Price = updatedBook.Price ?? 0m;
+                SelectedBook.PublicationDate = updatedBook.PublicationDate;
+                SelectedBook.PageCount = updatedBook.PageCount;
+                SelectedBook.GenreName = updatedBook.Genre?.GenreName ?? "";
+                SelectedBook.PublisherName = updatedBook.Publisher?.PublisherName ?? "";
+                SelectedBook.AuthorIds = updatedBook.BookAuthors
+                    .Select(ba => ba.AuthorId)
+                    .ToArray();
 
-        //    SelectedGenre = Genres.FirstOrDefault(g => g.GenreName == SelectedBook.GenreName),
-        //    SelectedPublisher = Publishers.FirstOrDefault(p => p.PublisherName == SelectedBook.PublisherName)
-        //};
+                SelectedBook.AuthorNameString = string.Join(", ",
+                    updatedBook.BookAuthors.Select(ba =>
+                        ba.Author.FirstName + " " + ba.Author.LastName));
 
-        //foreach(var author in vm.Authors)
-        //{
-        //    if (SelectedBook.AuthorIds.Contains(author.AuthorId))
-        //    {
-        //        author.IsSelected = true;
-        //    }
-        //}
-
-        //var dialog = new EditNewTitleDialog
-        //{
-        //    DataContext = vm
-        //};
-
-        //if (dialog.ShowDialog() != true)
-        //    return;
-
-
-        //var dto = dialog.Book;
-        //if (dto == null)
-        //    return;
-
-        //var updatedBook = _selectionService.UpdateBook(
-        //    SelectedBook.Isbn13,
-        //    dto.Title,
-        //    dto.Language,
-        //    dto.Price,
-        //    dto.PublicationDate,
-        //    dto.PageCount,
-        //    dto.GenreId,
-        //    dto.PublisherId
-        //);
-
-        ////  Uppdatera UI
-        //SelectedBook.Title = updatedBook.Title;
-        //SelectedBook.Language = updatedBook.Language;
-        //SelectedBook.Price = updatedBook.Price ?? 0m;
-        //SelectedBook.PublicationDate = updatedBook.PublicationDate;
-        //SelectedBook.PageCount = updatedBook.PageCount;
-        //SelectedBook.GenreName = vm.SelectedGenre?.GenreName;
-        //SelectedBook.PublisherName = vm.SelectedPublisher?.PublisherName;
-
-
+                SelectedBook.RaisePropertyChanged(nameof(SelectedBook.Title));
+                SelectedBook.RaisePropertyChanged(nameof(SelectedBook.Language));
+                SelectedBook.RaisePropertyChanged(nameof(SelectedBook.Price));
+                SelectedBook.RaisePropertyChanged(nameof(SelectedBook.PublicationDate));
+                SelectedBook.RaisePropertyChanged(nameof(SelectedBook.PageCount));
+                SelectedBook.RaisePropertyChanged(nameof(SelectedBook.GenreName));
+                SelectedBook.RaisePropertyChanged(nameof(SelectedBook.PublisherName));
+                SelectedBook.RaisePropertyChanged(nameof(SelectedBook.AuthorNameString));
+            }
 
         public void DeleteBookFromInventory(BookAdminItem bookItem)
         {
             if (bookItem == null) return;
 
-
             var book = _context.Books
-                 .Include(b => b.BookAuthors)   //include related authors for EF
+                .Include(b => b.BookAuthors)
                 .FirstOrDefault(b => b.Isbn13 == bookItem.Isbn13);
 
             if (book != null)
-
             {
-                if (book.BookAuthors != null && book.BookAuthors.Any())
+   
+                if (book.BookAuthors.Any())
                 {
-
                     _context.BookAuthors.RemoveRange(book.BookAuthors);
-
                 }
+
+                var inventories = _context.Inventories.Where(i => i.Isbn13 == book.Isbn13);
+                _context.Inventories.RemoveRange(inventories);
+
+       
                 _context.Books.Remove(book);
+
                 _context.SaveChanges();
 
                 Books.Remove(bookItem);
-
-
-                ReloadBooks();
                 RaisePropertyChanged(nameof(Books));
             }
         }
@@ -367,55 +330,19 @@ namespace BookStore_Presentation.ViewModels
             if (dto == null) return;
 
             var newAuthor = _authorService.CreateAuthor(dto.FirstName, dto.LastName, dto.BirthDay);
+
+            if (SelectedBook != null && newAuthor != null)
+            {
+                var bookAuthor = new BookAuthor
+                {
+                    AuthorId = newAuthor.AuthorId,
+                    BookIsbn13 = SelectedBook.Isbn13,
+                    Role = "Main Author"
+                };
+                _context.BookAuthors.Add(bookAuthor);
+                _context.SaveChanges();
+            }
+
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

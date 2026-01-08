@@ -98,10 +98,10 @@
                   SelectedItem="{Binding SelectedBook, Mode=TwoWay}">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ISBN-13" Binding="{Binding Isbn13}" Width="Auto"/>
+                <DataGridTextColumn Header="ISBN-13" Binding="{Binding Isbn13}" Width="100"/>
                 <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="Auto"/>
                 <DataGridTextColumn Header="Author" Binding="{Binding AuthorNameString}" Width="Auto"/>
-                <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" Width="Auto"/>
+                <DataGridTextColumn Header="Genre" Binding="{Binding GenreName}" Width="Auto"/>
                 <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="Auto"/>
                 <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat=F2}" Width="Auto"/>
                 <DataGridTextColumn Header="Published" Binding="{Binding PublicationDate}" Width="Auto"/>
