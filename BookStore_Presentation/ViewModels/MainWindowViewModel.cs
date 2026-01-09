@@ -20,12 +20,11 @@ namespace BookStore_Presentation.ViewModels
                 }
             }
 
-        // Commands for sidebar navigation
         public ICommand OpenInventoryByStoreCommand { get; }
         public ICommand OpenBookAdminCommand { get; }
         public ICommand OpenAllAuthorsCommand { get; }
 
-        // Keep VM instances to avoid recreating them
+        //Keep VM instances to avoid recreating them
         private readonly BooksAdminViewModel _booksVm;
         private readonly AuthorsAdminViewModel _authorsVm;
         private readonly InventoryByStoreViewModel _inventoryVm;
@@ -49,11 +48,11 @@ namespace BookStore_Presentation.ViewModels
                 CurrentViewModel = _booksVm;
             });
 
-            OpenAllAuthorsCommand = new DelegateCommand(_ =>
-            {
-                _authorsVm.LoadAuthors(); // Refresh authors before showing
-                CurrentViewModel = _authorsVm;
-            });
+            OpenAllAuthorsCommand = new AsyncDelegateCommand(async _ =>
+              {
+                  await _authorsVm.LoadAuthorsAsycn(); // Await the async load
+                  CurrentViewModel = _authorsVm;
+              });
 
           
             CurrentViewModel = _booksVm;
