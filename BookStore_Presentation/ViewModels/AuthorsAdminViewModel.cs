@@ -27,8 +27,8 @@ namespace BookStore_Presentation.ViewModels
                 _selectedAuthor = value;
                 RaisePropertyChanged();
 
-                ((DelegateCommand)EditAuthorCommand).RaiseCanExecuteChanged();
-                ((DelegateCommand)DeleteAuthorCommand).RaiseCanExecuteChanged();
+                ((AsyncDelegateCommand)EditAuthorCommand).RaiseCanExecuteChanged();
+                ((AsyncDelegateCommand)DeleteAuthorCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -43,18 +43,18 @@ namespace BookStore_Presentation.ViewModels
             _authorService = authorService;
             _context = new BookStoreContext();
 
-            LoadAuthors();
+            LoadAuthorsAsycn();
 
-            AddAuthorCommand = new DelegateCommand(_ => AddAuthor());
-            EditAuthorCommand = new DelegateCommand(_ => EditAuthor(), _ => SelectedAuthor != null);
-            DeleteAuthorCommand = new DelegateCommand(_ => DeleteAuthor(), _ => SelectedAuthor != null);
+            AddAuthorCommand = new AsyncDelegateCommand(_ => AddAuthorAsync());
+            EditAuthorCommand = new AsyncDelegateCommand(_ => EditAuthorAsync(), _ => SelectedAuthor != null);
+            DeleteAuthorCommand = new AsyncDelegateCommand(_ => DeleteAuthorAsync(), _ => SelectedAuthor != null);
         }
 
-        public void LoadAuthors()
+        public async Task LoadAuthorsAsycn()
         {
             Authors.Clear();
 
-            var authors = _context.Authors
+            var authors = await _context.Authors
                 .Include(a => a.BookAuthors)
                 .Select(a => new AuthorItem
                 {
@@ -63,13 +63,13 @@ namespace BookStore_Presentation.ViewModels
                     BirthDay = a.BirthDay,   // still stored
                     BooksCount = a.BookAuthors.Count
                 })
-                .ToList();
+                .ToListAsync();
 
             foreach (var a in authors)
                 Authors.Add(a);
         }
 
-        private void AddAuthor()
+        private async Task AddAuthorAsync()
         {
             var dialog = new AddNewAuthorDialog
             {
@@ -84,7 +84,7 @@ namespace BookStore_Presentation.ViewModels
                 return;
 
 
-            var newAuthor = _authorService.CreateAuthor(dto.FirstName, dto.LastName, dto.BirthDay);
+            var newAuthor = await _authorService.CreateAuthorAsync(dto.FirstName, dto.LastName, dto.BirthDay);
 
 
             Authors.Add(new AuthorItem
@@ -96,7 +96,7 @@ namespace BookStore_Presentation.ViewModels
             });
         }
 
-        private void EditAuthor()
+        private async Task EditAuthorAsync()
         {
 
             if (SelectedAuthor == null)
@@ -109,19 +109,27 @@ namespace BookStore_Presentation.ViewModels
                 {
                     FirstName = SelectedAuthor.FullName.Split(' ')[0],
                     LastName = SelectedAuthor.FullName.Split(' ').Length > 1 ? SelectedAuthor.FullName.Split(' ')[1] : "",
-                    BirthDayText = SelectedAuthor.BirthDay?.ToString("yyyy-MM-dd") // convert DateOnly to string
+                    BirthDayText = SelectedAuthor.BirthDay?.ToString("yyyy-MM-dd")
                 }
             };
 
-            // Show dialog and return if cancelled
+   
             if (dialog.ShowDialog() != true)
                 return;
 
-            // Get edited author DTO
+       
             var dto = dialog.Author;
             if (dto == null)
                 return;
-            var updateAuthor = _authorService.UpdateAuthor(
+
+            if (!_authorService.IsValidAuthor(dto.FirstName, dto.LastName, dto.BirthDay?.ToString(), out var error))
+            {
+                MessageBox.Show(error, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+
+            var updateAuthor = await _authorService.UpdateAuthorAsync(
             SelectedAuthor.AuthorId,
                  dto.FirstName,
                  dto.LastName,
@@ -134,7 +142,7 @@ namespace BookStore_Presentation.ViewModels
         }
 
 
-        private void DeleteAuthor()
+        private async Task DeleteAuthorAsync()
         {
             if (SelectedAuthor == null) return;
 
@@ -151,7 +159,7 @@ namespace BookStore_Presentation.ViewModels
             try
             {
 
-                _authorService.DeleteAuthor(SelectedAuthor.AuthorId);
+               await _authorService.DeleteAuthorAsync(SelectedAuthor.AuthorId);
 
                 Authors.Remove(SelectedAuthor);
 
