@@ -32,7 +32,7 @@ namespace BookStore_Presentation.Dialogs
         {
             if (DataContext is AddNewAuthorViewModel vm)
             {
-                // Parse the BirthDayText safely
+
                 DateOnly? birthDate = null;
                 if (!string.IsNullOrWhiteSpace(vm.BirthDayText) &&
                     DateOnly.TryParse(vm.BirthDayText, out var d))
@@ -40,7 +40,7 @@ namespace BookStore_Presentation.Dialogs
                     birthDate = d;
                 }
 
-                // Create the DTO to return
+    
                 Author = new CreateNewAuthorDto
                 {
                     FirstName = vm.FirstName,
@@ -48,7 +48,7 @@ namespace BookStore_Presentation.Dialogs
                     BirthDay = birthDate
                 };
 
-                DialogResult = true; // Close dialog with "OK"
+                DialogResult = true; 
                 Close();
             }
         }
