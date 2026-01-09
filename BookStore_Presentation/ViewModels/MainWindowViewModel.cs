@@ -5,7 +5,7 @@ using BookStore_Presentation.Services;
 
 namespace BookStore_Presentation.ViewModels
 {
-    internal class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ViewModelBase
  
         {
             // Current view bound to ContentControl
@@ -55,7 +55,7 @@ namespace BookStore_Presentation.ViewModels
               });
 
           
-            CurrentViewModel = _booksVm;
+            CurrentViewModel = _inventoryVm;
         }
     }
 }
