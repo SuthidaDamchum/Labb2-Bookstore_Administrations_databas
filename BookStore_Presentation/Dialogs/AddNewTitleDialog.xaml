@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BookStore_Presentation.Dialogs"
         xmlns:viewmodels="clr-namespace:BookStore_Presentation.ViewModels"
         mc:Ignorable="d"
-        Title="New Book Title" Height="550" Width="380"
+        Title="New Book Title" Height="550" Width="400"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#FAFAFA"
@@ -34,11 +34,11 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="170" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Text="Title:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8"/>
-                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" Margin="0,0,0,8"/>
+                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" Margin="0,0,0,8" Width="170"/>
 
              
                 <TextBlock Text="ISBN:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8"/>

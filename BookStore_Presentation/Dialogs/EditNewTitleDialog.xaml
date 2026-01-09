@@ -5,74 +5,100 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookStore_Presentation.Dialogs"
         xmlns:viewmodels="clr-namespace:BookStore_Presentation.ViewModels"
-        mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="EditNewTitleDialog" Height="550" Width="310"   ResizeMode="NoResize"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="Edit Book Title" Height="550" Width="400" ResizeMode="NoResize"
+        Background="#FAFAFA"
         d:DataContext="{d:DesignInstance Type=viewmodels:AddNewTitleViewModel, IsDesignTimeCreatable=True}">
-    
-    
-    <Grid Margin="20">
+
+    <Grid Margin="24">
         <Grid.RowDefinitions>
-            <RowDefinition Height="599*"/>
-            <RowDefinition Height="75*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
+        <Border Grid.Row="0" Background="White" CornerRadius="8" Padding="20" BorderBrush="#DDD" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="170"/>
+                </Grid.ColumnDefinitions>
 
-           
-                <StackPanel Margin="0,10,0,0">
-                <TextBlock Text="Title:"/>
-                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+                <TextBlock Text="Title:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" Margin="0,0,0,8"/>
 
-                <TextBlock Text="ISBN:"/>
-                <TextBox Text="{Binding ISBN, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10" IsReadOnly="True"/>
+                <TextBlock Text="ISBN:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding ISBN, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" IsReadOnly="True"/>
 
-                <TextBlock Text="Authors:" Margin="0,0,0,0"/>
-                <ComboBox x:Name="AuthorsComboBox"
-                          ItemsSource="{Binding Authors}"
-                          IsEditable="True"
-                          IsReadOnly="True"
-                          StaysOpenOnEdit="True"
-                          Width="270"
-                          MaxDropDownHeight="200"
-                          Text="{Binding SelectedAuthorsText, Mode=OneWay}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{Binding FullName}"
-                                      IsChecked="{Binding IsSelected, Mode=TwoWay}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                <TextBlock Text="Authors:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Top" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,8">
+                    <Border BorderBrush="#CCC" BorderThickness="1" CornerRadius="4" Padding="4" Background="#F5F5F5">
+                        <ScrollViewer MaxHeight="100" VerticalScrollBarVisibility="Auto">
+                            <ListBox ItemsSource="{Binding Authors}" SelectionMode="Multiple" BorderThickness="0" Background="Transparent">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding FullName}" 
+                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}" 
+                                                  VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </ScrollViewer>
+                    </Border>
+                    <TextBlock Text="{Binding SelectedAuthorsText}" FontStyle="Italic" Foreground="Gray" Margin="0,4,0,0"/>
+                </StackPanel>
 
-                <TextBlock Text="Language:" Margin="0 10 0 0"/>
-                <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedItem="{Binding Language}" Margin="0,0,0,10"/>
+                <TextBlock Text="Language:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedItem="{Binding Language}" Grid.Row="3" Grid.Column="1" Margin="0,0,0,8"/>
 
-                <TextBlock Text="Price:"/>
-                <TextBox Text="{Binding PriceText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+                <TextBlock Text="Price:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding PriceText, UpdateSourceTrigger=PropertyChanged}" Grid.Row="4" Grid.Column="1" Margin="0,0,0,8"/>
 
-                <TextBlock Text="Genre:"/>
-                <ComboBox ItemsSource="{Binding Genres}" DisplayMemberPath="GenreName" SelectedItem="{Binding SelectedGenre}" Margin="0,0,0,10"/>
+                <TextBlock Text="Genre:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <ComboBox ItemsSource="{Binding Genres}" DisplayMemberPath="GenreName" SelectedItem="{Binding SelectedGenre}" Grid.Row="5" Grid.Column="1" Margin="0,0,0,8"/>
 
-                <TextBlock Text="Publication Date (YYYY-MM-DD):"/>
-                <TextBox Text="{Binding PublicationDateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+                <TextBlock Text="Publication Date:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <StackPanel Grid.Row="6" Grid.Column="1" Margin="0,0,0,8">
+                    <TextBox Text="{Binding PublicationDateText, UpdateSourceTrigger=PropertyChanged}" 
+                             ToolTip="Enter date as YYYY-MM-DD"/>
+                    <TextBlock Text="Ex: 2024-05-01"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="DarkSlateGray"
+                               Margin="0,6,0,0"
+                               Background="#FFEFEFEF"
+                               Padding="4,2"/>
+                </StackPanel>
 
-                <TextBlock Text="Pages:"/>
-                <TextBox Text="{Binding PageCountText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+                <TextBlock Text="Pages:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding PageCountText, UpdateSourceTrigger=PropertyChanged}" Grid.Row="7" Grid.Column="1" Margin="0,0,0,8"/>
 
-                <TextBlock Text="Publisher:"/>
-                <ComboBox ItemsSource="{Binding Publishers}" DisplayMemberPath="PublisherName" SelectedItem="{Binding SelectedPublisher}" Margin="0,0,0,10"/>
-            </StackPanel>
- 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Grid.Row="1">
-            <Button Content="Save" Width="100" Margin="0,0,10,0"
+                <TextBlock Text="Publisher:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <ComboBox ItemsSource="{Binding Publishers}" DisplayMemberPath="PublisherName" SelectedItem="{Binding SelectedPublisher}" Grid.Row="8" Grid.Column="1" Margin="0,0,0,8"/>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+            <Button Content="Save" Width="120" Margin="0,0,16,0"
                     Command="{Binding EditCommand}"  
-                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-
-            <Button Content="Cancel" Width="100"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Background="#DDD" Foreground="Black" FontWeight="SemiBold"/>
+            <Button Content="Cancel" Width="120"
                     Command="{Binding CancelCommand}"   
-                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Background="#DDD" Foreground="Black" FontWeight="SemiBold"/>
         </StackPanel>
     </Grid>
 </Window>
-
-
-
-    
