@@ -95,7 +95,7 @@ namespace BookStore_Presentation.ViewModels
         {
 
             var addNewTitleViewModel = new AddNewTitleViewModel();
-            var dialog = new AddNewTitleDailog(addNewTitleViewModel);
+            var dialog = new AddNewTitleDialog(addNewTitleViewModel);
 
             if (dialog.ShowDialog() == true)
             {
