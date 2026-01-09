@@ -6,48 +6,60 @@
         xmlns:local="clr-namespace:BookStore_Presentation.Dialogs"
         xmlns:viewmodels="clr-namespace:BookStore_Presentation.ViewModels"
         mc:Ignorable="d"
-               Title="Edit New Author"  Height="250" Width="220"
-        WindowStartupLocation="CenterScreen"  ResizeMode="CanResize"
+        Title="Edit New Author" Height="320" Width="320"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize"
+        Background="#FAFAFA"
         d:DataContext="{d:DesignInstance Type=viewmodels:AuthorsAdminViewModel, IsDesignTimeCreatable=False}">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="180"/>
+            <RowDefinition Height="110"/>
         </Grid.RowDefinitions>
 
-        <!-- First Name -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,10">
-            <TextBlock Text="First Name" FontWeight="SemiBold"/>
-            <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" 
-                     Padding="3" BorderBrush="#CCC" BorderThickness="1" />
+        <Border Grid.Row="0" Background="White" CornerRadius="10" Padding="20" BorderBrush="#DDD" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="150"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="First Name:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" Margin="0,0,0,8"
+                         Padding="3" BorderBrush="#CCC" BorderThickness="1"/>
+
+                <TextBlock Text="Last Name:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" Margin="0,0,0,8"
+                         Padding="3" BorderBrush="#CCC" BorderThickness="1"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,15" FontWeight="SemiBold">
+                    <Run Text="Birth Date:"/>
+                    
+                </TextBlock>
+                <StackPanel Grid.Row="2" Grid.Column="1">
+                    <TextBox Text="{Binding BirthDayText, Mode=TwoWay, StringFormat=yyyy-MM-dd}"
+                             Padding="3" BorderBrush="#CCC" BorderThickness="1"
+                             ToolTip="Enter date as YYYY-MM-DD"/>
+                    <TextBlock Text="Ex: 1990-05-01"
+                  
+                               Foreground="DarkSlateGray"
+                               Margin="0,6,0,0"
+                               Background="#FFEFEFEF"
+                               Padding="4,2"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+            <Button Content="OK" Width="100" Margin="0,0,16,0" Click="OKButton_Click"
+                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+            <Button Content="Cancel" Width="100" Click="CancelButton_Click_1"
+                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
         </StackPanel>
-
-        <!-- Last Name -->
-        <StackPanel Grid.Row="1" Margin="0,0,0,10">
-            <TextBlock Text="Last Name" FontWeight="SemiBold"/>
-            <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" 
-                     Padding="3" BorderBrush="#CCC" BorderThickness="1"/>
-        </StackPanel>
-
-        <!-- Birth Date -->
-        <StackPanel Grid.Row="2" Margin="0,0,0,10">
-            <TextBlock>
-                <Run Text="Birth Date"  FontWeight="SemiBold" />
-                <Run Text=" (yyyy-MM-dd)" Foreground="Gray" FontStyle="Italic" FontSize="12"/>
-            </TextBlock>
-            <TextBox Text="{Binding BirthDayText, Mode=TwoWay, StringFormat=yyyy-MM-dd}" 
-                     Padding="3" BorderBrush="#CCC" BorderThickness="1"
-                     ToolTip="Enter date as YYYY-MM-DD"/>
-        </StackPanel>
-
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-            <Button Content="OK" Width="60" Margin="0,0,10,0" Click="OKButton_Click"/>
-            <Button Content="Cancel" Width="60" Click="CancelButton_Click_1"/>
-        </StackPanel>
-
-
     </Grid>
 </Window>
