@@ -56,3 +56,7 @@ Lets you select a book from the catalog and add it to a store’s inventory.
 When adding or editing a book, you select an author from the list.
 * Author Management: ✍
 You can only delete an author if they have no books. If an author has books, you must delete those books first.
+
+## 🖼️ Screenshots
+### Inventory by Store
+![Bookstore Administration Screenshot](BookStore_Presentation/Assets/inventory.png)
