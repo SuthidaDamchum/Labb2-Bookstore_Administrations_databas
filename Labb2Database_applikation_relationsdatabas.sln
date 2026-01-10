@@ -9,14 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookStore_Infrastrcuture", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookStore_Presentation", "BookStore_Presentation\BookStore_Presentation.csproj", "{0CB80722-8748-3ADB-5A16-B692EA7243D3}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application Screenshots", "Application Screenshots", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\..\..\..\Desktop\Application Screenshots\author-admin.png = ..\..\..\..\..\Desktop\Application Screenshots\author-admin.png
-		..\..\..\..\..\Desktop\Application Screenshots\books-admin.png = ..\..\..\..\..\Desktop\Application Screenshots\books-admin.png
-		..\..\..\..\..\Desktop\Application Screenshots\edit-book.png = ..\..\..\..\..\Desktop\Application Screenshots\edit-book.png
-		..\..\..\..\..\Desktop\Application Screenshots\inventory.png = ..\..\..\..\..\Desktop\Application Screenshots\inventory.png
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
