@@ -38,6 +38,26 @@ namespace BookStore_Presentation.ViewModels
             }
         }
 
+        private bool _isActive;
+        public bool IsActive
+        {
+            get => _isActive;
+                set
+            {
+                if (_isActive != value)
+                {
+                    _isActive = value;
+                    RaisePropertyChanged();
+                    ((AsyncDelegateCommand)AddBookToStoreCommand).RaiseCanExecuteChanged();
+                    ((AsyncDelegateCommand)RemoveBookFromStoreCommand).RaiseCanExecuteChanged();
+                    ((AsyncDelegateCommand)IncreaseQuantityCommand).RaiseCanExecuteChanged();
+                    ((AsyncDelegateCommand)DecreaseQuantityCommand).RaiseCanExecuteChanged();
+
+                }
+
+            }
+        }
+
         private InventoryItem? _selectedInventoryItem;
         public InventoryItem? SelectedInventoryItem
         {
@@ -94,18 +114,9 @@ namespace BookStore_Presentation.ViewModels
                     if (SelectedBook != null)
                         await AddBookToStoreAsync(SelectedBook);
                 },
-                _ => SelectedBook != null && SelectedStore != null
+                _ => SelectedBook != null && SelectedStore != null && IsActive
             );
 
-
-            AddBookToStoreCommand = new AsyncDelegateCommand(
-               async _ =>
-                {
-                    if (SelectedBook != null)
-                      await  AddBookToStoreAsync(SelectedBook);
-                },
-                _ => SelectedBook != null && SelectedStore != null
-            );
 
             RemoveBookFromStoreCommand = new AsyncDelegateCommand(
               async _ =>
