@@ -40,8 +40,14 @@
                 <TextBlock Text="Title:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8"/>
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" Margin="0,0,0,8" Width="170"/>
 
-             
-                <TextBlock Text="ISBN:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,8">
+                    <TextBlock Text="ISBN:"/>
+                    <TextBlock Text=" [13 digits]" 
+                               FontSize="11" 
+                               Foreground="Gray" 
+                               FontStyle="Italic" 
+                               Margin="4,0,0,0"/>
+                </StackPanel>
                 <TextBox Text="{Binding ISBN, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" Margin="0,0,0,8"/>
 
                 <TextBlock Text="Authors:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Top" Margin="0,0,8,8"/>
@@ -92,7 +98,7 @@
         </Border>
 
        
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,8">
             <Button Content="Save" Width="120" Margin="0,0,16,0" Command="{Binding SaveCommand}"  
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
