@@ -5,17 +5,17 @@
 Bookstore Administration is a WPF application that helps users manage inventory and data for several bookstores. The app uses Entity Framework Core, async methods, and a SQL Server database. Sensitive database connection information is stored in a JSON secrets file for security.
 
 ## Features
-*• View inventory for all stores
-*• Increase or decrease book quantity in each store
-*• Add new books to a store from the stock
-*• Remove books from a store’s inventory
-*• View all books, add new books, edit, or remove books
-*• View all authors, add new authors, edit, or remove authors
-*• Authors can only be deleted if they are not linked to any book
-*• Three main views: Inventory by Store, Books Admin, Authors Admin
-*• All database operations are asynchronous for a smooth user experience
-*• Uses service classes to handle business logic and data access
-
+* View inventory for all stores
+* Increase or decrease book quantity in each store
+* Add new books to a store from the stock
+* Remove books from a store’s inventory
+* View all books, add new books, edit, or remove books
+* View all authors, add new authors, edit, or remove authors
+* Authors can only be deleted if they are not linked to any book
+* Three main views: Inventory by Store, Books Admin, Authors Admin
+* All database operations are asynchronous for a smooth user experience
+* Uses service classes to handle business logic and data access
+  
 ## Setup Instructions
 
 1. **Clone the repository:**
