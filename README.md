@@ -56,11 +56,11 @@ Bookstore Administration is a WPF application that helps users manage inventory 
 
 ## How Relationships Are Used:
 
-* Inventory by Store:
+* Inventory by Store: 🗃️
 Shows all books available in the selected store, using the relationship between Stores, Inventory, and Books.
-📖 * Add Book to Store:
+* Add Book to Store: 📖
 Lets you select a book from the catalog and add it to a store’s inventory.
-*⚙️ Book Management:
+* Book Management: ⚙️
 When adding or editing a book, you select an author from the list.
-*✍ Author Management:
+* Author Management: ✍
 You can only delete an author if they have no books. If an author has books, you must delete those books first.
