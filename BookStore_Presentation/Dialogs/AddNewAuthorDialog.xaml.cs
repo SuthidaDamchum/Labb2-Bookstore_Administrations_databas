@@ -46,6 +46,7 @@ namespace BookStore_Presentation.Dialogs
             }
 
             DialogResult = true;
+            MessageBox.Show("Author saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             Close();
         }
 

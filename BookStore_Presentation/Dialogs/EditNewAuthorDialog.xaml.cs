@@ -48,7 +48,8 @@ namespace BookStore_Presentation.Dialogs
                     BirthDay = birthDate
                 };
 
-                DialogResult = true; 
+                DialogResult = true;
+                MessageBox.Show("Author edited successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 Close();
             }
         }
