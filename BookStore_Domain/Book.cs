@@ -17,19 +17,10 @@ public partial class Book
 
     public int? PageCount { get; set; }
 
-    public int? GenreId { get; set; }
-
-    public int? PublisherId { get; set; }
-
     public virtual ICollection<BookAuthor> BookAuthors { get; set; } = new List<BookAuthor>();
-
-    public virtual Genre? Genre { get; set; }   
 
     public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
-    public virtual Publisher? Publisher { get; set; }
-
-    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

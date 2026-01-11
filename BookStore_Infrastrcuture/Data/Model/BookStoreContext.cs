@@ -26,23 +26,14 @@ public partial class BookStoreContext : DbContext
 
     public virtual DbSet<Customer> Customers { get; set; }
 
-    public virtual DbSet<Genre> Genres { get; set; }
 
     public virtual DbSet<Inventory> Inventories { get; set; }
-
-    public virtual DbSet<OpenOrdersVsInventory> OpenOrdersVsInventories { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
-    public virtual DbSet<Publisher> Publishers { get; set; }
-
-    public virtual DbSet<Review> Reviews { get; set; }
-
     public virtual DbSet<Store> Stores { get; set; }
-
-    public virtual DbSet<TitlesPerAuthor> TitlesPerAuthors { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -57,15 +48,11 @@ public partial class BookStoreContext : DbContext
         new AuthorEntityTypeConfiguration().Configure(modelBuilder.Entity<Author>());
         new BookEntityTypeConfiguration().Configure(modelBuilder.Entity<Book>());
         new BookAuthorEntityTypeConfiguration().Configure(modelBuilder.Entity<BookAuthor>());
-        new GenreEntityTypeConfiguration().Configure(modelBuilder.Entity<Genre>());
         new InventoryEntityTypeConfiguration().Configure(modelBuilder.Entity<Inventory>());
-        new OpenOrdersVsInventoryEntityTypeConfiguration().Configure(modelBuilder.Entity<OpenOrdersVsInventory>());
         new OrderEntityTypeConfiguration().Configure(modelBuilder.Entity<Order>());
         new OrderItemEntityTypeConfiguration().Configure(modelBuilder.Entity<OrderItem>());
-        new PublisherEntityTypeConfiguration().Configure(modelBuilder.Entity<Publisher>());
-        new TitlesPerAuthorEntityTypeConfiguration().Configure(modelBuilder.Entity<TitlesPerAuthor>());
         new StoreEntityTypeConfiguration().Configure(modelBuilder.Entity<Store>());
-        new ReviewEntityTypeConfiguration().Configure(modelBuilder.Entity<Review>());
+
 
 
         OnModelCreatingPartial(modelBuilder);
