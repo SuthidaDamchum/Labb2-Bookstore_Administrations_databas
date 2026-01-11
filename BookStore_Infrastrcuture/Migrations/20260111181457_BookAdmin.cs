@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BookStore_Infrastrcuture.Migrations
 {
     /// <inheritdoc />
-    public partial class BookAdminDatabase : Migration
+    public partial class BookAdmin : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,6 +24,22 @@ namespace BookStore_Infrastrcuture.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__Authors__86516BCF744ECEB0", x => x.author_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Books",
+                columns: table => new
+                {
+                    isbn13 = table.Column<string>(type: "char(13)", unicode: false, fixedLength: true, maxLength: 13, nullable: false),
+                    title = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    language = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    price = table.Column<decimal>(type: "decimal(8,2)", nullable: true),
+                    publication_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    page_count = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__Books__AA00666DB9607A12", x => x.isbn13);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,35 +63,6 @@ namespace BookStore_Infrastrcuture.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Genres",
-                columns: table => new
-                {
-                    genre_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    genre_name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Genres__18428D427A7E6811", x => x.genre_id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Publisher",
-                columns: table => new
-                {
-                    publisher_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    publisher_name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    city = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    country = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Publishe__3263F29DE1B716F9", x => x.publisher_id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Stores",
                 columns: table => new
                 {
@@ -90,60 +77,6 @@ namespace BookStore_Infrastrcuture.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__Stores__A2F2A30C0791EF0A", x => x.store_id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Books",
-                columns: table => new
-                {
-                    isbn13 = table.Column<string>(type: "char(13)", unicode: false, fixedLength: true, maxLength: 13, nullable: false),
-                    title = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    language = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    price = table.Column<decimal>(type: "decimal(8,2)", nullable: true),
-                    publication_date = table.Column<DateOnly>(type: "date", nullable: true),
-                    page_count = table.Column<int>(type: "int", nullable: true),
-                    genre_id = table.Column<int>(type: "int", nullable: true),
-                    publisher_id = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Books__AA00666DB9607A12", x => x.isbn13);
-                    table.ForeignKey(
-                        name: "FK_Books_Genres",
-                        column: x => x.genre_id,
-                        principalTable: "Genres",
-                        principalColumn: "genre_id");
-                    table.ForeignKey(
-                        name: "FK_Books_Publisher",
-                        column: x => x.publisher_id,
-                        principalTable: "Publisher",
-                        principalColumn: "publisher_id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    order_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    customer_id = table.Column<int>(type: "int", nullable: false),
-                    store_id = table.Column<int>(type: "int", nullable: false),
-                    order_datetime = table.Column<DateTime>(type: "smalldatetime", nullable: false, defaultValueSql: "(getdate())"),
-                    order_status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: "Pending")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Orders__4659622910AD0AB2", x => x.order_id);
-                    table.ForeignKey(
-                        name: "FK_Orders_Customers",
-                        column: x => x.customer_id,
-                        principalTable: "Customers",
-                        principalColumn: "customer_id");
-                    table.ForeignKey(
-                        name: "FK__Orders__store_id__4BAC3F29",
-                        column: x => x.store_id,
-                        principalTable: "Stores",
-                        principalColumn: "store_id");
                 });
 
             migrationBuilder.CreateTable(
@@ -194,29 +127,29 @@ namespace BookStore_Infrastrcuture.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Review",
+                name: "Orders",
                 columns: table => new
                 {
+                    order_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     customer_id = table.Column<int>(type: "int", nullable: false),
-                    isbn13 = table.Column<string>(type: "char(13)", unicode: false, fixedLength: true, maxLength: 13, nullable: false),
-                    rating = table.Column<int>(type: "int", nullable: true),
-                    comment = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    review_datetime = table.Column<DateTime>(type: "smalldatetime", nullable: true)
+                    store_id = table.Column<int>(type: "int", nullable: false),
+                    order_datetime = table.Column<DateTime>(type: "smalldatetime", nullable: false, defaultValueSql: "(getdate())"),
+                    order_status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: "Pending")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_review", x => new { x.customer_id, x.isbn13 });
+                    table.PrimaryKey("PK__Orders__4659622910AD0AB2", x => x.order_id);
                     table.ForeignKey(
-                        name: "FK__Review__customer__2EDAF651",
+                        name: "FK_Orders_Customers",
                         column: x => x.customer_id,
                         principalTable: "Customers",
                         principalColumn: "customer_id");
                     table.ForeignKey(
-                        name: "FK__Review__isbn13__2FCF1A8A",
-                        column: x => x.isbn13,
-                        principalTable: "Books",
-                        principalColumn: "isbn13",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK__Orders__store_id__4BAC3F29",
+                        column: x => x.store_id,
+                        principalTable: "Stores",
+                        principalColumn: "store_id");
                 });
 
             migrationBuilder.CreateTable(
@@ -248,16 +181,6 @@ namespace BookStore_Infrastrcuture.Migrations
                 name: "IX_BookAuthor_author_id",
                 table: "BookAuthor",
                 column: "author_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Books_genre_id",
-                table: "Books",
-                column: "genre_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Books_publisher_id",
-                table: "Books",
-                column: "publisher_id");
 
             migrationBuilder.CreateIndex(
                 name: "UQ_Customers_Email",
@@ -292,11 +215,6 @@ namespace BookStore_Infrastrcuture.Migrations
                 name: "IX_Orders_store_id",
                 table: "Orders",
                 column: "store_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Review_isbn13",
-                table: "Review",
-                column: "isbn13");
         }
 
         /// <inheritdoc />
@@ -312,28 +230,19 @@ namespace BookStore_Infrastrcuture.Migrations
                 name: "Order_Items");
 
             migrationBuilder.DropTable(
-                name: "Review");
-
-            migrationBuilder.DropTable(
                 name: "Authors");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Books");
 
             migrationBuilder.DropTable(
-                name: "Books");
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Customers");
 
             migrationBuilder.DropTable(
                 name: "Stores");
-
-            migrationBuilder.DropTable(
-                name: "Genres");
-
-            migrationBuilder.DropTable(
-                name: "Publisher");
         }
     }
 }

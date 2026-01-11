@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore_Infrastrcuture.Migrations
 {
     [DbContext(typeof(BookStoreContext))]
-    [Migration("20260111093544_Book-Admin-Database")]
-    partial class BookAdminDatabase
+    [Migration("20260111181457_BookAdmin")]
+    partial class BookAdmin
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,10 +65,6 @@ namespace BookStore_Infrastrcuture.Migrations
                         .HasColumnName("isbn13")
                         .IsFixedLength();
 
-                    b.Property<int?>("GenreId")
-                        .HasColumnType("int")
-                        .HasColumnName("genre_id");
-
                     b.Property<string>("Language")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
@@ -86,10 +82,6 @@ namespace BookStore_Infrastrcuture.Migrations
                         .HasColumnType("date")
                         .HasColumnName("publication_date");
 
-                    b.Property<int?>("PublisherId")
-                        .HasColumnType("int")
-                        .HasColumnName("publisher_id");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -98,10 +90,6 @@ namespace BookStore_Infrastrcuture.Migrations
 
                     b.HasKey("Isbn13")
                         .HasName("PK__Books__AA00666DB9607A12");
-
-                    b.HasIndex("GenreId");
-
-                    b.HasIndex("PublisherId");
 
                     b.ToTable("Books");
                 });
@@ -199,27 +187,6 @@ namespace BookStore_Infrastrcuture.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("BookStore_Domain.Genre", b =>
-                {
-                    b.Property<int>("GenreId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("genre_id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GenreId"));
-
-                    b.Property<string>("GenreName")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)")
-                        .HasColumnName("genre_name");
-
-                    b.HasKey("GenreId")
-                        .HasName("PK__Genres__18428D427A7E6811");
-
-                    b.ToTable("Genres");
-                });
-
             modelBuilder.Entity("BookStore_Domain.Inventory", b =>
                 {
                     b.Property<int>("StoreId")
@@ -243,45 +210,6 @@ namespace BookStore_Infrastrcuture.Migrations
                     b.HasIndex("Isbn13");
 
                     b.ToTable("Inventory", (string)null);
-                });
-
-            modelBuilder.Entity("BookStore_Domain.OpenOrdersVsInventory", b =>
-                {
-                    b.Property<int>("InventoryQuantity")
-                        .HasColumnType("int")
-                        .HasColumnName("inventory_quantity");
-
-                    b.Property<string>("Isbn13")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .IsUnicode(false)
-                        .HasColumnType("char(13)")
-                        .HasColumnName("isbn13")
-                        .IsFixedLength();
-
-                    b.Property<int?>("OrderedNotDelivered")
-                        .HasColumnType("int")
-                        .HasColumnName("ordered_not_delivered");
-
-                    b.Property<int?>("RemainingAfterOrders")
-                        .HasColumnType("int")
-                        .HasColumnName("remaining_after_orders");
-
-                    b.Property<string>("StoreName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("store_name");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("title");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("OpenOrdersVsInventory", (string)null);
                 });
 
             modelBuilder.Entity("BookStore_Domain.Order", b =>
@@ -354,76 +282,6 @@ namespace BookStore_Infrastrcuture.Migrations
                     b.ToTable("Order_Items", (string)null);
                 });
 
-            modelBuilder.Entity("BookStore_Domain.Publisher", b =>
-                {
-                    b.Property<int>("PublisherId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("publisher_id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PublisherId"));
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("address");
-
-                    b.Property<string>("City")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("city");
-
-                    b.Property<string>("Country")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("country");
-
-                    b.Property<string>("PublisherName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("publisher_name");
-
-                    b.HasKey("PublisherId")
-                        .HasName("PK__Publishe__3263F29DE1B716F9");
-
-                    b.ToTable("Publisher", (string)null);
-                });
-
-            modelBuilder.Entity("BookStore_Domain.Review", b =>
-                {
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int")
-                        .HasColumnName("customer_id");
-
-                    b.Property<string>("Isbn13")
-                        .HasMaxLength(13)
-                        .IsUnicode(false)
-                        .HasColumnType("char(13)")
-                        .HasColumnName("isbn13")
-                        .IsFixedLength();
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("comment");
-
-                    b.Property<int?>("Rating")
-                        .HasColumnType("int")
-                        .HasColumnName("rating");
-
-                    b.Property<DateTime?>("ReviewDatetime")
-                        .HasColumnType("smalldatetime")
-                        .HasColumnName("review_datetime");
-
-                    b.HasKey("CustomerId", "Isbn13")
-                        .HasName("PK_review");
-
-                    b.HasIndex("Isbn13");
-
-                    b.ToTable("Review", (string)null);
-                });
-
             modelBuilder.Entity("BookStore_Domain.Store", b =>
                 {
                     b.Property<int>("StoreId")
@@ -467,57 +325,6 @@ namespace BookStore_Infrastrcuture.Migrations
                         .HasName("PK__Stores__A2F2A30C0791EF0A");
 
                     b.ToTable("Stores");
-                });
-
-            modelBuilder.Entity("BookStore_Domain.TitlesPerAuthor", b =>
-                {
-                    b.Property<string>("Age")
-                        .IsRequired()
-                        .HasMaxLength(16)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(16)")
-                        .HasColumnName("age");
-
-                    b.Property<string>("InventoryValue")
-                        .IsRequired()
-                        .HasMaxLength(44)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(44)")
-                        .HasColumnName("inventory_value");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(101)
-                        .HasColumnType("nvarchar(101)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Titles")
-                        .IsRequired()
-                        .HasMaxLength(16)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(16)")
-                        .HasColumnName("titles");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("TitlesPerAuthor", (string)null);
-                });
-
-            modelBuilder.Entity("BookStore_Domain.Book", b =>
-                {
-                    b.HasOne("BookStore_Domain.Genre", "Genre")
-                        .WithMany("Books")
-                        .HasForeignKey("GenreId")
-                        .HasConstraintName("FK_Books_Genres");
-
-                    b.HasOne("BookStore_Domain.Publisher", "Publisher")
-                        .WithMany("Books")
-                        .HasForeignKey("PublisherId")
-                        .HasConstraintName("FK_Books_Publisher");
-
-                    b.Navigation("Genre");
-
-                    b.Navigation("Publisher");
                 });
 
             modelBuilder.Entity("BookStore_Domain.BookAuthor", b =>
@@ -598,26 +405,6 @@ namespace BookStore_Infrastrcuture.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("BookStore_Domain.Review", b =>
-                {
-                    b.HasOne("BookStore_Domain.Customer", "Customer")
-                        .WithMany("Reviews")
-                        .HasForeignKey("CustomerId")
-                        .IsRequired()
-                        .HasConstraintName("FK__Review__customer__2EDAF651");
-
-                    b.HasOne("BookStore_Domain.Book", "Isbn13Navigation")
-                        .WithMany("Reviews")
-                        .HasForeignKey("Isbn13")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK__Review__isbn13__2FCF1A8A");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Isbn13Navigation");
-                });
-
             modelBuilder.Entity("BookStore_Domain.Author", b =>
                 {
                     b.Navigation("BookAuthors");
@@ -630,30 +417,16 @@ namespace BookStore_Infrastrcuture.Migrations
                     b.Navigation("Inventories");
 
                     b.Navigation("OrderItems");
-
-                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("BookStore_Domain.Customer", b =>
                 {
                     b.Navigation("Orders");
-
-                    b.Navigation("Reviews");
-                });
-
-            modelBuilder.Entity("BookStore_Domain.Genre", b =>
-                {
-                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("BookStore_Domain.Order", b =>
                 {
                     b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("BookStore_Domain.Publisher", b =>
-                {
-                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("BookStore_Domain.Store", b =>
