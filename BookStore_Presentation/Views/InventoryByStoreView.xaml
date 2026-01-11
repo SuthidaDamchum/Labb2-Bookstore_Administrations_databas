@@ -5,10 +5,13 @@
              xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:UI="clr-namespace:BookStore_Presentation.ViewModels"
+             xmlns:conv="clr-namespace:BookStore_Presentation.Converters"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=UI:InventoryByStoreViewModel, IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
+        <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
+
         <Style x:Key="ToolbarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="0,0,10,0"/>
             <Setter Property="Padding" Value="10,6"/>
@@ -48,22 +51,36 @@
 
     <Grid Margin="15">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="150"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0"
-                Padding="12"
+                Padding="10"
                 CornerRadius="6"
                 Background="#F5F5F5"
                 BorderBrush="#D0D0D0"
                 BorderThickness="1">
 
             <StackPanel>
-                <TextBlock Text= "📚 Stores"
+                <TextBlock Text="📚 Stores"
                            FontSize="16"
                            FontWeight="SemiBold"
                            Margin="0,0,0,8"/>
+
+                <!-- Add Store Button -->
+                <Button Content="➕ Add Store"
+                        Width="120"
+                        Margin="0,0,0,10"
+                        Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding AddStoreCommand}"/>
+
+                <Button Content="🗑 Delete Store"
+                        Width="120"
+                        Margin="0,0,0,10"
+                        Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding DeleteStoreCommand}"
+                        IsEnabled="{Binding SelectedStore, Converter={StaticResource NullToBoolConverter}}"/>
 
                 <ListBox ItemsSource="{Binding Stores}"
                          SelectedItem="{Binding SelectedStore}"
@@ -88,7 +105,7 @@
             </StackPanel>
         </Border>
 
-        <Grid Grid.Column="1" Margin="15,0,0,0">
+        <Grid Grid.Column="1" Margin="10,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -156,4 +173,4 @@
             </Border>
         </Grid>
     </Grid>
-</UserControl>  
+</UserControl>

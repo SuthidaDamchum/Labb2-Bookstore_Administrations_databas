@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using BookStore_Presentation.ViewModels;
 
 namespace BookStore_Presentation.Views
 {
@@ -10,7 +11,7 @@ namespace BookStore_Presentation.Views
         public InventoryByStoreView()
         {
             InitializeComponent();
-       
+
         }
     }
 }
