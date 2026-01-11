@@ -71,7 +71,7 @@
                     </StackPanel>
                 </Button>
                 <Button Command="{Binding EditNewBookTitleCommand}" 
-                        CommandParameter="{Binding SelectedBook}"
+                        CommandParameter="{Binding SelectedBookInBookAdmin}"
                         Width="120" Style="{StaticResource ToolbarButtonStyle}">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <TextBlock Text="✏" Margin="0,0,5,0"/>
@@ -79,7 +79,7 @@
                     </StackPanel>
                 </Button>
                 <Button Command="{Binding DeleteBookFromInventoryCommand}" 
-                        CommandParameter="{Binding SelectedBook}" Width="120" Style="{StaticResource ToolbarButtonStyle}">
+                        CommandParameter="{Binding SelectedBookInBookAdmin}" Width="120" Style="{StaticResource ToolbarButtonStyle}">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <TextBlock Text="🗑" Margin="0,0,5,0"/>
                         <TextBlock Text="Delete Book"/>
@@ -103,7 +103,7 @@
                       GridLinesVisibility="All"
                       HeadersVisibility="Column"
                       BorderThickness="0"
-                      SelectedItem="{Binding SelectedBook, Mode=TwoWay}">
+                      SelectedItem="{Binding SelectedBookInBookAdmin, Mode=TwoWay}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ISBN-13" Binding="{Binding Isbn13}" Width="100"/>
                     <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="Auto"/>

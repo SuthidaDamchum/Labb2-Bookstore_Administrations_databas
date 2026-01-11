@@ -16,7 +16,7 @@ namespace BookStore_Presentation.ViewModels
     public class BooksAdminViewModel : ViewModelBase
     {
 
-        private readonly BookSelectionService _selectionService;
+        private readonly BookService _bookService;
 
         private readonly AuthorService _authorService = new AuthorService(new BookStoreContext());
 
@@ -31,12 +31,13 @@ namespace BookStore_Presentation.ViewModels
         public List<Genre> Genres { get; }
         public List<Publisher> Publishers { get; }
 
-        public BooksAdminViewModel(BookSelectionService selectionService, AuthorService authorService)
+        public BooksAdminViewModel(AuthorService authorService)
         {
 
+
             _authorService = authorService;
-            _selectionService = selectionService;
             _context = new BookStoreContext();
+            _bookService = new BookService(_context);
 
 
             Genres = _context.Genres.AsNoTracking().ToList();
@@ -50,7 +51,7 @@ namespace BookStore_Presentation.ViewModels
 
             EditNewBookTitleCommand = new AsyncDelegateCommand(
               async  _ => await EditNewBookTitleAsync(),
-                _ => SelectedBook != null);
+                _ => SelectedBookInBookAdmin != null);
 
 
             DeleteBookFromInventoryCommand = new AsyncDelegateCommand(
@@ -79,12 +80,13 @@ namespace BookStore_Presentation.ViewModels
           );
         }
 
-        public BookAdminItem? SelectedBook
+        private BookAdminItem? _selectedBookInBookAdmin;
+        public BookAdminItem? SelectedBookInBookAdmin
         {
-            get => _selectionService.SelectedBook;
+            get => _selectedBookInBookAdmin;
             set
             {
-                _selectionService.SelectedBook = value;
+                _selectedBookInBookAdmin = value;
                 RaisePropertyChanged();
                 ((AsyncDelegateCommand)EditNewBookTitleCommand).RaiseCanExecuteChanged();
                 ((AsyncDelegateCommand)DeleteBookFromInventoryCommand).RaiseCanExecuteChanged();
@@ -165,11 +167,9 @@ namespace BookStore_Presentation.ViewModels
            .ToList();
         }
 
-
         public List<string> LanguageOptions { get; } = new List<string>
 
         { "English", "Swedish", "Norwegian", "French", "Spanish", "Danish", "German" };
-
 
         public void CreateNewBookTitle
          (
@@ -182,10 +182,7 @@ namespace BookStore_Presentation.ViewModels
            .Where(a => existingAuthorIds.Contains(a.AuthorId))
            .ToList();
 
-            if (!authors.Any())
-
-                throw new Exception("Could not find any authors with the specified IDs.");
-
+         
             var newBookTitle = new Book
 
             {
@@ -249,21 +246,22 @@ namespace BookStore_Presentation.ViewModels
 
         private async Task EditNewBookTitleAsync()
         {
-            if (SelectedBook == null)
+            if (SelectedBookInBookAdmin == null)
                 return;
 
             var viewModel = new AddNewTitleViewModel();
-            viewModel.LoadFromBook(SelectedBook);
+            viewModel.LoadFromBook(SelectedBookInBookAdmin);
 
             var dialog = new EditNewTitleDialog
             {
                 DataContext = viewModel,
-                //Owner = Application.Current.MainWindow
             };  
 
             if (dialog.ShowDialog() != true)
+            {
+                SelectedBookInBookAdmin = null; 
                 return;
-
+            }
 
             using var context = new BookStoreContext();
 
@@ -273,7 +271,7 @@ namespace BookStore_Presentation.ViewModels
                     .ThenInclude(ba => ba.Author)
                 .Include(b => b.Genre)
                 .Include(b => b.Publisher)
-                .FirstOrDefaultAsync(b => b.Isbn13 == SelectedBook.Isbn13);
+                .FirstOrDefaultAsync(b => b.Isbn13 == SelectedBookInBookAdmin.Isbn13);
 
             if (updatedBook == null)
             {
@@ -283,29 +281,31 @@ namespace BookStore_Presentation.ViewModels
             }
 
 
-            SelectedBook.Title = updatedBook.Title;
-            SelectedBook.Language = updatedBook.Language;
-            SelectedBook.Price = updatedBook.Price ?? 0m;
-            SelectedBook.PublicationDate = updatedBook.PublicationDate;
-            SelectedBook.PageCount = updatedBook.PageCount;
-            SelectedBook.GenreName = updatedBook.Genre?.GenreName ?? "";
-            SelectedBook.PublisherName = updatedBook.Publisher?.PublisherName ?? "";
-            SelectedBook.AuthorIds = updatedBook.BookAuthors
+       
+
+            SelectedBookInBookAdmin.Title = updatedBook.Title;
+            SelectedBookInBookAdmin.Language = updatedBook.Language;
+            SelectedBookInBookAdmin.Price = updatedBook.Price ?? 0m;
+            SelectedBookInBookAdmin.PublicationDate = updatedBook.PublicationDate;
+            SelectedBookInBookAdmin.PageCount = updatedBook.PageCount;
+            SelectedBookInBookAdmin.GenreName = updatedBook.Genre?.GenreName ?? "";
+            SelectedBookInBookAdmin.PublisherName = updatedBook.Publisher?.PublisherName ?? "";
+            SelectedBookInBookAdmin.AuthorIds = updatedBook.BookAuthors
                 .Select(ba => ba.AuthorId)
                 .ToArray();
 
-            SelectedBook.AuthorNameString = string.Join(", ",
+            SelectedBookInBookAdmin.AuthorNameString = string.Join(", ",
                 updatedBook.BookAuthors.Select(ba =>
                     ba.Author.FirstName + " " + ba.Author.LastName));
 
-            SelectedBook.RaisePropertyChanged(nameof(SelectedBook.Title));
-            SelectedBook.RaisePropertyChanged(nameof(SelectedBook.Language));
-            SelectedBook.RaisePropertyChanged(nameof(SelectedBook.Price));
-            SelectedBook.RaisePropertyChanged(nameof(SelectedBook.PublicationDate));
-            SelectedBook.RaisePropertyChanged(nameof(SelectedBook.PageCount));
-            SelectedBook.RaisePropertyChanged(nameof(SelectedBook.GenreName));
-            SelectedBook.RaisePropertyChanged(nameof(SelectedBook.PublisherName));
-            SelectedBook.RaisePropertyChanged(nameof(SelectedBook.AuthorNameString));
+            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.Title));
+            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.Language));
+            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.Price));
+            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.PublicationDate));
+            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.PageCount));
+            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.GenreName));
+            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.PublisherName));
+            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.AuthorNameString));
         }
 
         public async Task DeleteBookFromInventoryAsync(BookAdminItem bookItem)
@@ -352,12 +352,12 @@ namespace BookStore_Presentation.ViewModels
 
             var newAuthor = await _authorService.CreateAuthorAsync(dto.FirstName, dto.LastName, dto.BirthDay);
 
-            if (SelectedBook != null && newAuthor != null)
+            if (SelectedBookInBookAdmin != null && newAuthor != null)
             {
                 var bookAuthor = new BookAuthor
                 {
                     AuthorId = newAuthor.AuthorId,
-                    BookIsbn13 = SelectedBook.Isbn13,
+                    BookIsbn13 = SelectedBookInBookAdmin.Isbn13,
                     Role = "Main Author"
                 };
                 _context.BookAuthors.Add(bookAuthor);

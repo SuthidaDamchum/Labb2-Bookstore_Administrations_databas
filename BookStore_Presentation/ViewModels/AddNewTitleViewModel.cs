@@ -10,6 +10,7 @@ using BookStore_Domain;
 using BookStore_Infrastrcuture.Data.Model;
 using BookStore_Presentation.Command;
 using BookStore_Presentation.Models;
+using BookStore_Presentation.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore_Presentation.ViewModels
@@ -17,6 +18,8 @@ namespace BookStore_Presentation.ViewModels
     public class AddNewTitleViewModel : ViewModelBase
     {
         private readonly BookStoreContext _context;
+        private readonly BookService _bookService;
+
 
         public AddNewTitleViewModel()
         {
@@ -185,15 +188,24 @@ namespace BookStore_Presentation.ViewModels
 
             int? pageCount = int.TryParse(PageCountText, out var p) ? p : null;
 
-            book.Title = Title;
-            book.Language = Language;
-            book.Price = price;
-            book.GenreId = SelectedGenre?.GenreId;
-            book.PublisherId = SelectedPublisher?.PublisherId;
-            book.PublicationDate = publicationDate;
-            book.PageCount = pageCount;
+            var updatedBook = _bookService.UpdateBook(
+                  ISBN,
+                  Title,
+                  Language,
+                  price,
+                  publicationDate,
+                  pageCount,
+                  SelectedGenre?.GenreId,
+                  SelectedPublisher?.PublisherId
+              );
 
-            //sync authors
+            if (updatedBook == null)
+            {
+                MessageBox.Show("Book not found.");
+                return;
+            }
+
+
             var selectedIds = SelectedAuthors.Select(a => a.AuthorId).ToList();
             var toRemove = book.BookAuthors.Where(ba => !selectedIds.Contains(ba.AuthorId)).ToList();
             foreach (var ba in toRemove) book.BookAuthors.Remove(ba);

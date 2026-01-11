@@ -6,15 +6,12 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace BookStore_Presentation.Services
 {
-    public class BookSelectionService
+    public class BookService
     {
-        public BookAdminItem? SelectedBook { get; set; }
-
 
         private readonly BookStoreContext _context;
 
-
-            public BookSelectionService(BookStoreContext context)
+            public BookService(BookStoreContext context)
             {
                 _context = context;
             }

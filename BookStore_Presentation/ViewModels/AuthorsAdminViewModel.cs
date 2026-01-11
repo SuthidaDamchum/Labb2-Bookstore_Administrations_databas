@@ -113,9 +113,11 @@ namespace BookStore_Presentation.ViewModels
                 }
             };
 
-   
             if (dialog.ShowDialog() != true)
+            {
+                SelectedAuthor = null;
                 return;
+            }
 
        
             var dto = dialog.Author;

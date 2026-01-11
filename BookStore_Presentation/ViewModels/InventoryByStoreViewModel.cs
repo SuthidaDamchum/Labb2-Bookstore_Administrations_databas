@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using BookStore_Domain;
 using BookStore_Infrastrcuture.Data.Model;
@@ -11,7 +12,8 @@ namespace BookStore_Presentation.ViewModels
 {
     internal class InventoryByStoreViewModel : ViewModelBase
     {
-        private readonly BookSelectionService _selectionService;
+
+
         private readonly BookStoreContext _context = new();
         private readonly BooksAdminViewModel _bookCatalog;
         public ObservableCollection<BookAdminItem> AvailableBooks { get; private set; }
@@ -20,8 +22,8 @@ namespace BookStore_Presentation.ViewModels
 
         public AsyncDelegateCommand IncreaseQuantityCommand { get; }
         public AsyncDelegateCommand DecreaseQuantityCommand { get; }
-        public ICommand RemoveBookFromStoreCommand { get; }
-        public ICommand AddBookToStoreCommand { get; }
+        public AsyncDelegateCommand RemoveBookFromStoreCommand { get; }
+        public AsyncDelegateCommand AddBookToStoreCommand { get; }
 
         public ObservableCollection<Store> Stores { get; private set; }
         public ObservableCollection<InventoryItem> Inventory { get; private set; } = new();
@@ -38,25 +40,21 @@ namespace BookStore_Presentation.ViewModels
             }
         }
 
-        private bool _isActive;
-        public bool IsActive
+        private BookAdminItem? _selectedBookInInventory;
+        public BookAdminItem? SelectedBookInInventory
         {
-            get => _isActive;
-                set
+            get => _selectedBookInInventory;
+            set
             {
-                if (_isActive != value)
-                {
-                    _isActive = value;
-                    RaisePropertyChanged();
-                    ((AsyncDelegateCommand)AddBookToStoreCommand).RaiseCanExecuteChanged();
-                    ((AsyncDelegateCommand)RemoveBookFromStoreCommand).RaiseCanExecuteChanged();
-                    ((AsyncDelegateCommand)IncreaseQuantityCommand).RaiseCanExecuteChanged();
-                    ((AsyncDelegateCommand)DecreaseQuantityCommand).RaiseCanExecuteChanged();
-
-                }
-
+                _selectedBookInInventory = value;
+                RaisePropertyChanged();
+                ((AsyncDelegateCommand)AddBookToStoreCommand).RaiseCanExecuteChanged();
             }
         }
+
+
+            
+       
 
         private InventoryItem? _selectedInventoryItem;
         public InventoryItem? SelectedInventoryItem
@@ -71,21 +69,12 @@ namespace BookStore_Presentation.ViewModels
                 ((AsyncDelegateCommand)RemoveBookFromStoreCommand).RaiseCanExecuteChanged();
             }
         }
-    
-        public BookAdminItem? SelectedBook
-        {
-            get => _selectionService.SelectedBook;
-            set
-            {
-                _selectionService.SelectedBook = value;
-                RaisePropertyChanged();
-                ((AsyncDelegateCommand)AddBookToStoreCommand).RaiseCanExecuteChanged();
-            }
-        }
 
-        public InventoryByStoreViewModel(BookSelectionService selectionService, BooksAdminViewModel booksVm)
+
+
+        public InventoryByStoreViewModel(BooksAdminViewModel booksVm)
         {
-            _selectionService = selectionService;
+
             _bookCatalog = booksVm;
 
             _ = LoadStoresAsync();
@@ -111,26 +100,43 @@ namespace BookStore_Presentation.ViewModels
             AddBookToStoreCommand = new AsyncDelegateCommand(
                 async _ =>
                 {
-                    if (SelectedBook != null)
-                        await AddBookToStoreAsync(SelectedBook);
+                    if (SelectedBookInInventory != null)
+
+
+
+                        await AddBookToStoreAsync(SelectedBookInInventory);
                 },
-                _ => SelectedBook != null && SelectedStore != null && IsActive
+                _ => SelectedBookInInventory != null && SelectedStore != null
             );
 
 
             RemoveBookFromStoreCommand = new AsyncDelegateCommand(
-              async _ =>
-                {
-                    if (SelectedInventoryItem != null)
-                      await RemoveBookFromStoreAsync(SelectedInventoryItem);
-                },
-                _ => SelectedInventoryItem != null && SelectedStore != null
+        async _ =>
+        {
+            if (SelectedInventoryItem == null)
+                return;
+
+            var result = MessageBox.Show(
+                $"Are you sure you want to delete '{SelectedInventoryItem.Title}' from this store?",
+                "Confirm Delete",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning
             );
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await RemoveBookFromStoreAsync(SelectedInventoryItem);
+            }
+        },
+        _ => SelectedInventoryItem != null && SelectedStore != null
+    );
         }
 
         private async Task AddBookToStoreAsync(BookAdminItem book)
         {
             if (SelectedStore == null || book == null) return;
+
+            var isbn = book.Isbn13;
 
             var inventory = await _context.Inventories
                 .FirstOrDefaultAsync(i => i.Isbn13 == book.Isbn13 && i.StoreId == SelectedStore.StoreId);
@@ -151,6 +157,9 @@ namespace BookStore_Presentation.ViewModels
 
             await _context.SaveChangesAsync();
             await LoadInventoryAsync();
+
+            SelectedInventoryItem = Inventory
+                .FirstOrDefault(i => i.ISBN == isbn);
         }
 
         private async Task RemoveBookFromStoreAsync(InventoryItem item)

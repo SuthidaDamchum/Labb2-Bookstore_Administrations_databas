@@ -109,7 +109,7 @@
                                Margin="0,0,0,10"/>
 
                     <ComboBox ItemsSource="{Binding AvailableBooks}"
-                              SelectedItem="{Binding SelectedBook}"
+                              SelectedItem="{Binding SelectedBookInInventory}"
                               DisplayMemberPath="Title"
                               Height="30"
                               IsEditable="True"

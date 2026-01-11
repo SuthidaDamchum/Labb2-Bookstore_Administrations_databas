@@ -30,12 +30,12 @@ namespace BookStore_Presentation.ViewModels
         private readonly InventoryByStoreViewModel _inventoryVm;
 
 
-        public MainWindowViewModel(BookSelectionService bookSelectionService, AuthorService authorService)
+        public MainWindowViewModel(AuthorService authorService)
         {
       
-            _booksVm = new BooksAdminViewModel(bookSelectionService, authorService);
+            _booksVm = new BooksAdminViewModel(authorService);
             _authorsVm = new AuthorsAdminViewModel(authorService);
-            _inventoryVm = new InventoryByStoreViewModel(bookSelectionService, _booksVm);
+            _inventoryVm = new InventoryByStoreViewModel(_booksVm);
 
      
             OpenInventoryByStoreCommand = new DelegateCommand(_ =>
