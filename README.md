@@ -70,4 +70,4 @@ You can only delete an author if they have no books. If an author has books, you
 ![Bookstore Administration Screenshot](BookStore_Presentation/Assets/author-admin.png)
 
 ### Add / Edit Book Dialog
-![Bookstore Administration Screenshot](BookStore_Presentation/Assets/add-edit-book.png).
+![Bookstore Administration Screenshot](BookStore_Presentation/Assets/add-edit-book.png)
