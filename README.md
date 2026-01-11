@@ -1,5 +1,4 @@
-<img width="795" height="281" alt="image" src="https://github.com/user-attachments/assets/9c332992-4ef9-4edc-b580-f411567cc617" /># Develop a Relational Database App with Entity Framework 🛠️ 
-
+# Develop a Relational Database App with Entity Framework 🛠️ 
 # 🏬 Bookstore Administration
 
 Bookstore Administration is a WPF application designed to manage inventory and data across multiple bookstores. It is built using Entity Framework Core, async/await, and a SQL Server database, and follows the MVVM pattern to ensure clean architecture and long-term maintainability. The application delivers a responsive user experience by utilizing ICommand-based UI interactions and asynchronous database operations.
@@ -23,8 +22,9 @@ Bookstore Administration is a WPF application designed to manage inventory and d
 
 2. **Configure the database connection:**
    * The database connection string is stored in a secrets.json file for security.
-   * In Visual Studio, right-click the project and select "Manage User Secrets".
-   *Note if there's no "Manage User Secrets" option, try to install Windows Communication Foundation from Visual studio installer.
+   * In Visual Studio, right-click the project "BookStore_Infrastrcuture" and select "Manage User Secrets".
+   *Note if there's no "Manage User Secrets" option, try to install "Windows Communication Foundation" package from the Visual studio installer:*
+   <img width="795" height="281" alt="image" src="https://github.com/user-attachments/assets/9c332992-4ef9-4edc-b580-f411567cc617" />
 
    * Add your SQL Server connection string in the JSON file like this:
    *Note that the database doesn't need to exist, but will be created during step 3*
@@ -36,11 +36,12 @@ Bookstore Administration is a WPF application designed to manage inventory and d
 
 3. **Apply database migrations:**
    * Open the Package Manager Console.
+   * Set "BookStore_Presentation" as Start up project and set default project to "BookStore_Infrastrcuture"
    * Run: `Update-Database` to create the database.
 
 5. **Build and run the app:**
    * Press F5 or click "Start" in Visual Studio.
-
+ 
 ## 📜 Usage
 
 * When you start the app, the first page shows the inventory by store. Here you can see and adjust inventory, add new books, delete books, and change quantities.
