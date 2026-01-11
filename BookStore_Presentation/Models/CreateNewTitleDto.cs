@@ -10,7 +10,6 @@ namespace BookStore_Presentation.Models
     {
         public string Isbn13 { get; set; } = null!;
         public string Title { get; set; } = null!;
-
         public string? Language { get; set; }
 
         public decimal? Price { get; set; }
@@ -18,10 +17,6 @@ namespace BookStore_Presentation.Models
         public DateOnly? PublicationDate { get; set; }
 
         public int? PageCount { get; set; }
-
-        public int? GenreId { get; set; }
-
-        public int? PublisherId { get; set; }
 
         public List<int> AuthorIds { get; set; } = new List<int>();
 

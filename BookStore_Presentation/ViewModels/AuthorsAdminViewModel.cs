@@ -71,9 +71,8 @@ namespace BookStore_Presentation.ViewModels
 
         private async Task AddAuthorAsync()
         {
-            var dialog = new AddNewAuthorDialog
-            {
-            };
+            var dialog = new AddNewAuthorDialog();
+          
 
             if (dialog.ShowDialog() != true)
                 return;
@@ -82,6 +81,7 @@ namespace BookStore_Presentation.ViewModels
             var dto = dialog.Author;
             if (dto == null)
                 return;
+
 
 
             var newAuthor = await _authorService.CreateAuthorAsync(dto.FirstName, dto.LastName, dto.BirthDay);

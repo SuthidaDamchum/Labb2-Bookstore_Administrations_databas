@@ -27,10 +27,6 @@ namespace BookStore_Presentation.ViewModels
         public ICommand EditNewBookTitleCommand { get; }
         public ICommand CreateNewAuthorCommand { get; }
 
-
-        public List<Genre> Genres { get; }
-        public List<Publisher> Publishers { get; }
-
         public BooksAdminViewModel(AuthorService authorService)
         {
 
@@ -39,9 +35,6 @@ namespace BookStore_Presentation.ViewModels
             _context = new BookStoreContext();
             _bookService = new BookService(_context);
 
-
-            Genres = _context.Genres.AsNoTracking().ToList();
-            Publishers = _context.Publishers.AsNoTracking().ToList();
 
             Books = new ObservableCollection<BookAdminItem>(LoadBooks());
 
@@ -111,8 +104,6 @@ namespace BookStore_Presentation.ViewModels
 
             var books = await _context.Books
                 .AsNoTracking()
-                .Include(b => b.Genre)
-                .Include(b => b.Publisher)
                 .Include(b => b.BookAuthors)
                      .ThenInclude(ba => ba.Author)
                 .ToListAsync();
@@ -127,8 +118,6 @@ namespace BookStore_Presentation.ViewModels
                     Language = b.Language,
                     Price = b.Price ?? 0m,
                     PublicationDate = b.PublicationDate,
-                    GenreName = b.Genre?.GenreName ?? "",
-                    PublisherName = b.Publisher?.PublisherName ?? "",
                     AuthorIds = b.BookAuthors.Select(ba => ba.AuthorId).ToArray(),
                     AuthorNameString = string.Join(" ,", b.BookAuthors.Select(ba => ba.Author.FirstName + " " + ba.Author.LastName ))
 
@@ -141,8 +130,6 @@ namespace BookStore_Presentation.ViewModels
         {
             return _context.Books
                 .AsNoTracking()
-           .Include(b => b.Genre)
-           .Include(b => b.Publisher)
            .Include(b => b.BookAuthors)
                .ThenInclude(ba => ba.Author)
            .Select(b => new BookAdminItem
@@ -154,14 +141,11 @@ namespace BookStore_Presentation.ViewModels
                b.BookAuthors.Select(ba =>
                ba.Author.FirstName + " " + ba.Author.LastName)),
 
-               GenreName = b.Genre != null ? b.Genre.GenreName : string.Empty,
 
                Language = b.Language,
                Price = b.Price ?? 0m,
                PublicationDate = b.PublicationDate,
                PageCount = b.PageCount,
-
-               PublisherName = b.Publisher != null ? b.Publisher.PublisherName : "",
                AuthorIds = b.BookAuthors.Select(b => b.AuthorId).ToArray()
            })
            .ToList();
@@ -188,13 +172,11 @@ namespace BookStore_Presentation.ViewModels
             {
                 Isbn13 = isbn13,
                 Title = title,
-                GenreId = genreId,
                 Language = language,
                 Price = price,
                 PublicationDate = publicationdate,
                 PageCount = pagecount,
-                PublisherId = publisherId,
-
+        
 
                 BookAuthors = authors.Select(a => new BookAuthor
                 {
@@ -205,39 +187,16 @@ namespace BookStore_Presentation.ViewModels
             _context.Books.Add(newBookTitle);
             _context.SaveChanges();
 
-            string genreName = "";
-
-            if (genreId != null)
-            {
-                var genre = _context.Genres.Find(genreId);
-                if (genre != null)
-                {
-                    genreName = genre.GenreName;
-                }
-            }
-
-            string publisherName = "";
-            if (publisherId != null)
-            {
-                var publisher = _context.Publishers.Find(publisherId);
-                if (publisher != null)
-                {
-                    publisherName = publisher.PublisherName;
-                }
-            }
-
 
             Books.Add(new BookAdminItem
             {
                 Isbn13 = newBookTitle.Isbn13,
                 Title = newBookTitle.Title,
                 AuthorNameString = string.Join(", ", authors.Select(a => $"{a.FirstName} {a.LastName}")),
-                GenreName = genreName,
                 Language = newBookTitle.Language,
                 Price = newBookTitle.Price ?? 0m,
                 PublicationDate = newBookTitle.PublicationDate,
                 PageCount = newBookTitle.PageCount,
-                PublisherName = publisherName,
                 AuthorIds = authors.Select(a => a.AuthorId).ToArray()
 
             });
@@ -269,8 +228,6 @@ namespace BookStore_Presentation.ViewModels
                 .AsNoTracking()
                 .Include(b => b.BookAuthors)
                     .ThenInclude(ba => ba.Author)
-                .Include(b => b.Genre)
-                .Include(b => b.Publisher)
                 .FirstOrDefaultAsync(b => b.Isbn13 == SelectedBookInBookAdmin.Isbn13);
 
             if (updatedBook == null)
@@ -288,8 +245,6 @@ namespace BookStore_Presentation.ViewModels
             SelectedBookInBookAdmin.Price = updatedBook.Price ?? 0m;
             SelectedBookInBookAdmin.PublicationDate = updatedBook.PublicationDate;
             SelectedBookInBookAdmin.PageCount = updatedBook.PageCount;
-            SelectedBookInBookAdmin.GenreName = updatedBook.Genre?.GenreName ?? "";
-            SelectedBookInBookAdmin.PublisherName = updatedBook.Publisher?.PublisherName ?? "";
             SelectedBookInBookAdmin.AuthorIds = updatedBook.BookAuthors
                 .Select(ba => ba.AuthorId)
                 .ToArray();
@@ -303,8 +258,6 @@ namespace BookStore_Presentation.ViewModels
             SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.Price));
             SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.PublicationDate));
             SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.PageCount));
-            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.GenreName));
-            SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.PublisherName));
             SelectedBookInBookAdmin.RaisePropertyChanged(nameof(SelectedBookInBookAdmin.AuthorNameString));
         }
 

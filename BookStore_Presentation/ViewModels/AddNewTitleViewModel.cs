@@ -25,9 +25,6 @@ namespace BookStore_Presentation.ViewModels
         {
             _context = new BookStoreContext();
 
-            // Load reference data
-            Genres = _context.Genres.ToList();
-            Publishers = _context.Publishers.ToList();
 
             Authors = new ObservableCollection<AuthorItem>(
                 _context.Authors
@@ -61,13 +58,7 @@ namespace BookStore_Presentation.ViewModels
         public string? PriceText { get; set; }
         public string? PublicationDateText { get; set; }
         public string? PageCountText { get; set; }
-
-        public Genre? SelectedGenre { get; set; }
-        public Publisher? SelectedPublisher { get; set; }
-
         public List<string> LanguageOptions { get; set; }
-        public List<Genre> Genres { get; set; }
-        public List<Publisher> Publishers { get; set; }
 
         private ObservableCollection<AuthorItem> _authors = new();
         public ObservableCollection<AuthorItem> Authors
@@ -100,9 +91,6 @@ namespace BookStore_Presentation.ViewModels
             PriceText = book.Price.ToString("0.##", CultureInfo.InvariantCulture);
             PublicationDateText = book.PublicationDate?.ToString("yyyy-MM-dd");
             PageCountText = book.PageCount?.ToString();
-
-            SelectedGenre = Genres.FirstOrDefault(g => g.GenreName == book.GenreName);
-            SelectedPublisher = Publishers.FirstOrDefault(p => p.PublisherName == book.PublisherName);
 
             //Mark authors as selected
             foreach (var author in Authors)
@@ -139,8 +127,6 @@ namespace BookStore_Presentation.ViewModels
                 Isbn13 = ISBN,
                 Language = Language,
                 Price = price,
-                GenreId = SelectedGenre?.GenreId,
-                PublisherId = SelectedPublisher?.PublisherId,
                 PublicationDate = publicationDate,
                 PageCount = pageCount,
                 BookAuthors = SelectedAuthors.Select(a => new BookAuthor
@@ -194,9 +180,7 @@ namespace BookStore_Presentation.ViewModels
                   Language,
                   price,
                   publicationDate,
-                  pageCount,
-                  SelectedGenre?.GenreId,
-                  SelectedPublisher?.PublisherId
+                  pageCount
               );
 
             if (updatedBook == null)

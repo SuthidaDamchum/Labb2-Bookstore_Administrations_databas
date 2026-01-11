@@ -14,10 +14,8 @@ namespace BookStore_Presentation.Models
         public string? Language { get; set; }
         public decimal Price { get; set; }
         public int? PageCount { get; set; }
-        public string GenreName { get; set; } = "";
         public DateOnly? PublicationDate { get; set; }
         public string AuthorNameString { get; set; } = "";
-        public string PublisherName { get; set; } = "";
         public int[] AuthorIds { get; set; } = [];
     }
 }
