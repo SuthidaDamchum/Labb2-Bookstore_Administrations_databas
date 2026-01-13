@@ -183,6 +183,10 @@ namespace BookStore_Presentation.ViewModels
 
         }
 
+        public async Task InitializeAsync()
+        {
+            await LoadStoresAsync();
+        }
         private async Task AddBookToStoreAsync(BookAdminItem book)
         {
             if (SelectedStore == null || book == null) return;

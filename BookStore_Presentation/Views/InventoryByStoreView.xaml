@@ -6,6 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:UI="clr-namespace:BookStore_Presentation.ViewModels"
              xmlns:conv="clr-namespace:BookStore_Presentation.Converters"
+             Loaded="Window_Loaded"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=UI:InventoryByStoreViewModel, IsDesignTimeCreatable=False}">
 
