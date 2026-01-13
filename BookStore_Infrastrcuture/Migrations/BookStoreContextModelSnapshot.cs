@@ -51,6 +51,22 @@ namespace BookStore_Infrastrcuture.Migrations
                         .HasName("PK__Authors__86516BCF744ECEB0");
 
                     b.ToTable("Authors");
+
+                    b.HasData(
+                        new
+                        {
+                            AuthorId = 26,
+                            BirthDay = new DateOnly(1980, 2, 1),
+                            FirstName = "James",
+                            LastName = "Clear"
+                        },
+                        new
+                        {
+                            AuthorId = 27,
+                            BirthDay = new DateOnly(1982, 6, 10),
+                            FirstName = "Cal",
+                            LastName = "Newport"
+                        });
                 });
 
             modelBuilder.Entity("BookStore_Domain.Book", b =>
@@ -89,6 +105,32 @@ namespace BookStore_Infrastrcuture.Migrations
                         .HasName("PK__Books__AA00666DB9607A12");
 
                     b.ToTable("Books");
+
+                    b.HasData(
+                        new
+                        {
+                            Isbn13 = "9781111000001",
+                            Language = "English",
+                            PageCount = 320,
+                            Price = 250m,
+                            Title = "Atomic Habits"
+                        },
+                        new
+                        {
+                            Isbn13 = "9781111000002",
+                            Language = "English",
+                            PageCount = 304,
+                            Price = 300m,
+                            Title = "Deep Work"
+                        },
+                        new
+                        {
+                            Isbn13 = "9781111000003",
+                            Language = "English",
+                            PageCount = 304,
+                            Price = 280m,
+                            Title = "Digital Minimalism"
+                        });
                 });
 
             modelBuilder.Entity("BookStore_Domain.BookAuthor", b =>
@@ -117,6 +159,13 @@ namespace BookStore_Infrastrcuture.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("BookAuthor", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            BookIsbn13 = "9781111000001",
+                            AuthorId = 26
+                        });
                 });
 
             modelBuilder.Entity("BookStore_Domain.Customer", b =>
@@ -207,6 +256,26 @@ namespace BookStore_Infrastrcuture.Migrations
                     b.HasIndex("Isbn13");
 
                     b.ToTable("Inventory", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            StoreId = 1,
+                            Isbn13 = "9781111000002",
+                            Quantity = 10
+                        },
+                        new
+                        {
+                            StoreId = 2,
+                            Isbn13 = "9781111000001",
+                            Quantity = 5
+                        },
+                        new
+                        {
+                            StoreId = 3,
+                            Isbn13 = "9781111000003",
+                            Quantity = 15
+                        });
                 });
 
             modelBuilder.Entity("BookStore_Domain.Order", b =>
@@ -322,6 +391,35 @@ namespace BookStore_Infrastrcuture.Migrations
                         .HasName("PK__Stores__A2F2A30C0791EF0A");
 
                     b.ToTable("Stores");
+
+                    b.HasData(
+                        new
+                        {
+                            StoreId = 1,
+                            Address = "123 Main St",
+                            City = "Springfield",
+                            Country = "USA",
+                            PostalCode = "12345",
+                            StoreName = "Green Leaf Books"
+                        },
+                        new
+                        {
+                            StoreId = 2,
+                            Address = "456 Oak Ave",
+                            City = "Rivertown",
+                            Country = "USA",
+                            PostalCode = "67890",
+                            StoreName = "Sunrise Reads"
+                        },
+                        new
+                        {
+                            StoreId = 3,
+                            Address = "789 Pine Rd",
+                            City = "Lakeside",
+                            Country = "USA",
+                            PostalCode = "54321",
+                            StoreName = "Riverstone Books"
+                        });
                 });
 
             modelBuilder.Entity("BookStore_Domain.BookAuthor", b =>

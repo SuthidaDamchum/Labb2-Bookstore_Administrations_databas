@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace BookStore_Infrastrcuture.Migrations
 {
     /// <inheritdoc />
-    public partial class BookAdmin : Migration
+    public partial class SeedDemoData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -175,6 +177,50 @@ namespace BookStore_Infrastrcuture.Migrations
                         principalTable: "Orders",
                         principalColumn: "order_id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Authors",
+                columns: new[] { "author_id", "birth_date", "first_name", "last_name" },
+                values: new object[,]
+                {
+                    { 26, new DateOnly(1980, 2, 1), "James", "Clear" },
+                    { 27, new DateOnly(1982, 6, 10), "Cal", "Newport" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Books",
+                columns: new[] { "isbn13", "language", "page_count", "price", "publication_date", "title" },
+                values: new object[,]
+                {
+                    { "9781111000001", "English", 320, 250m, null, "Atomic Habits" },
+                    { "9781111000002", "English", 304, 300m, null, "Deep Work" },
+                    { "9781111000003", "English", 304, 280m, null, "Digital Minimalism" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Stores",
+                columns: new[] { "store_id", "address", "city", "country", "postal_code", "store_name" },
+                values: new object[,]
+                {
+                    { 1, "123 Main St", "Springfield", "USA", "12345", "Green Leaf Books" },
+                    { 2, "456 Oak Ave", "Rivertown", "USA", "67890", "Sunrise Reads" },
+                    { 3, "789 Pine Rd", "Lakeside", "USA", "54321", "Riverstone Books" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "BookAuthor",
+                columns: new[] { "author_id", "BookIsbn13" },
+                values: new object[] { 26, "9781111000001" });
+
+            migrationBuilder.InsertData(
+                table: "Inventory",
+                columns: new[] { "isbn13", "store_id", "quantity" },
+                values: new object[,]
+                {
+                    { "9781111000002", 1, 10 },
+                    { "9781111000001", 2, 5 },
+                    { "9781111000003", 3, 15 }
                 });
 
             migrationBuilder.CreateIndex(

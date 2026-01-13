@@ -138,8 +138,9 @@ namespace BookStore_Presentation.ViewModels
                Title = b.Title,
 
                AuthorNameString = string.Join(", ",
-               b.BookAuthors.Select(ba =>
-               ba.Author.FirstName + " " + ba.Author.LastName)),
+               b.BookAuthors
+               .Where(ba => ba.Author != null)
+               .Select(ba => ba.Author.FirstName + " " + ba.Author.LastName)),
 
 
                Language = b.Language,
