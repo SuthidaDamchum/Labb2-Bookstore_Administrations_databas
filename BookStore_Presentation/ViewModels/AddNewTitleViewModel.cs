@@ -24,7 +24,7 @@ namespace BookStore_Presentation.ViewModels
         public AddNewTitleViewModel()
         {
             _context = new BookStoreContext();
-
+            _bookService = new BookService(_context);
 
             Authors = new ObservableCollection<AuthorItem>(
                 _context.Authors
